@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
