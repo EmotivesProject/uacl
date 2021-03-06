@@ -1,5 +1,5 @@
 module uacl
 
-go 1.13
+go 1.16
 
-require github.com/gorilla/mux v1.8.0
+require github.com/go-chi/chi v4.1.2+incompatible
