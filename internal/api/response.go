@@ -1,0 +1,41 @@
+package api
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"uacl/model"
+)
+
+func resultResponseJSON(w http.ResponseWriter, status int, result interface{}) {
+	response := model.Response{
+		Result: result,
+	}
+
+	responseJSON(w, status, response)
+}
+
+func messageResponseJSON(w http.ResponseWriter, status int, message string) {
+	response := model.Response{
+		Message: &message,
+	}
+
+	responseJSON(w, status, response)
+}
+
+func responseJSON(w http.ResponseWriter, status int, response interface{}) {
+	payload, err := json.Marshal(response)
+	if err != nil {
+		fmt.Println("Error encoding object")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(status)
+	_, err = w.Write(payload)
+
+	if err != nil {
+		fmt.Println("Error writing data")
+	}
+}
