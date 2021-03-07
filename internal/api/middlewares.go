@@ -9,10 +9,10 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-type key int
+type key string
 
 const (
-	userID key = 1
+	userID key = "empty"
 )
 
 var (
@@ -31,7 +31,7 @@ func verifyJTW() func(http.Handler) http.Handler {
 				messageResponseJSON(w, http.StatusBadRequest, errUnauthorised.Error())
 				return
 			}
-			ctx := context.WithValue(r.Context(), userID, tk.ID)
+			ctx := context.WithValue(r.Context(), userID, tk.EncodedID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

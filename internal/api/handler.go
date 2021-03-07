@@ -7,8 +7,13 @@ import (
 	"net/http"
 	"uacl/internal/db"
 	"uacl/model"
+	"uacl/pkg/encode"
 
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	encodePrefix = "USER"
 )
 
 var (
@@ -25,6 +30,21 @@ func FetchItems(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context().Value(userID)
 	fmt.Printf("Fetching information for %+v", ctx)
 	messageResponseJSON(w, http.StatusOK, "CONNECTED")
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	user := &model.User{}
+	err := json.NewDecoder(r.Body).Decode(user)
+	if err != nil {
+		messageResponseJSON(w, http.StatusBadRequest, errFailedDecoding.Error())
+		return
+	}
+	resp, err := db.FindOne(user.Email, user.Password, database)
+	if err != nil {
+		messageResponseJSON(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+	resultResponseJSON(w, http.StatusCreated, resp)
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -48,20 +68,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultResponseJSON(w, http.StatusCreated, createdUser)
-}
-
-func Login(w http.ResponseWriter, r *http.Request) {
-	user := &model.User{}
-	err := json.NewDecoder(r.Body).Decode(user)
-	if err != nil {
-		messageResponseJSON(w, http.StatusBadRequest, errFailedDecoding.Error())
-		return
-	}
-	resp, err := db.FindOne(user.Email, user.Password, database)
+	encodedID, err := encode.GenerateBase64ID(8, encodePrefix)
 	if err != nil {
 		messageResponseJSON(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-	resultResponseJSON(w, http.StatusCreated, resp)
+	encodedID = encodedID[:len(encodedID)-1]
+	user.EncodedID = encodedID
+	database.Save(user)
+
+	user.Password = ""
+	resultResponseJSON(w, http.StatusCreated, user)
 }

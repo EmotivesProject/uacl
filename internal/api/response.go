@@ -26,7 +26,7 @@ func messageResponseJSON(w http.ResponseWriter, status int, message string) {
 func responseJSON(w http.ResponseWriter, status int, response interface{}) {
 	payload, err := json.Marshal(response)
 	if err != nil {
-		fmt.Println("Error encoding object")
+		fmt.Println(err.Error())
 		return
 	}
 

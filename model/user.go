@@ -9,5 +9,6 @@ type User struct {
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"created_time" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_time" gorm:"autoUpdateTime:milli"`
+	UpdatedAt time.Time `json:"updated_time" gorm:"autoUpdateTime"`
+	EncodedID string    `json:"encoded_id"`
 }

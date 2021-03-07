@@ -32,9 +32,9 @@ func FindOne(email, password string, database *gorm.DB) (map[string]interface{},
 	fmt.Println(err.Error())
 
 	tk := &model.Token{
-		ID:    user.ID,
-		Name:  user.Name,
-		Email: user.Email,
+		EncodedID: user.EncodedID,
+		Name:      user.Name,
+		Email:     user.Email,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: expiresAt,
 		},
