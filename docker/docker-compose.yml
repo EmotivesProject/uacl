@@ -5,8 +5,17 @@ services:
     build:
       context: ../.
       dockerfile: docker/Dockerfile
-    ports:
-      - 8080:8080
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ../:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.uacl.rule=Host(`uacl.localhost`)"
+      - "traefik.http.routers.uacl.entrypoints=web"
+    networks:
+      traefik:
+
+networks:
+  traefik:
+    external:
+      name: traefik

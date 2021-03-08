@@ -10,6 +10,6 @@ RUN go mod download
 
 RUN go get github.com/githubnemo/CompileDaemon
 
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT CompileDaemon -log-prefix=false -build="go build ./cmd/api/" -command="./api"
