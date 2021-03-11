@@ -8,7 +8,7 @@ import (
 func CreateRouter() chi.Router {
 	r := chi.NewRouter()
 
-	r.With(SimpleMiddleware())
+	r.Use(SimpleMiddleware())
 
 	r.Get("/healthz", healthz)
 
