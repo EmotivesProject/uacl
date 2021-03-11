@@ -10,7 +10,7 @@ services:
       - ../:/app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.uacl.rule=Host(`api.emotives.net/uacl/`)"
+      - "traefik.http.routers.uacl.rule=Host(`api.emotives.net`)"
       - "traefik.http.routers.uacl.tls=true"
       - "traefik.http.routers.uacl.tls.certresolver=letsencrypt"
     networks:
