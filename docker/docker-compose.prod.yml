@@ -10,8 +10,9 @@ services:
       - ../:/app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.uacl.rule=Host(`uacl.localhost`)"
-      - "traefik.http.routers.uacl.entrypoints=web"
+      - "traefik.http.routers.fastapi.rule=Host(`api.emotives.net/uacl/`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
     networks:
       traefik:
 
