@@ -11,9 +11,6 @@ func CreateRouter() chi.Router {
 	r.Use(SimpleMiddleware())
 
 	r.Route("/uacl/", func(r chi.Router) {
-		r.Use(verifyJTW())
-		r.Get("/", FetchItems)
-
 		r.Get("/healthz", healthz)
 
 		r.Route("/create_user", func(r chi.Router) {

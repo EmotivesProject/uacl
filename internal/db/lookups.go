@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	errNoEmail            = errors.New("No email found in request")
+	errNoEmail            = errors.New("No email found in database!")
 	errInvalidCredentials = errors.New("Invalid login credentials. Please try again")
 )
 
@@ -26,10 +26,9 @@ func FindOne(email, password string, database *gorm.DB) (map[string]interface{},
 	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		fmt.Println(err.Error())
 		return nil, errInvalidCredentials
 	}
-
-	fmt.Println(err.Error())
 
 	tk := &model.Token{
 		EncodedID: user.EncodedID,
