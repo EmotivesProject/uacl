@@ -10,7 +10,7 @@ services:
       - ../:/app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.uacl.rule=Host(`uacl.localhost`)"
+      - "traefik.http.routers.uacl.rule=Host(`api.localhost`)"
       - "traefik.http.routers.uacl.entrypoints=web"
     networks:
       traefik:
