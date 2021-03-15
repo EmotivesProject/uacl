@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"uacl/model"
-
-	jwt "github.com/dgrijalva/jwt-go"
+	"uacl/pkg/auth"
 )
 
 type key string
@@ -23,15 +21,12 @@ func verifyJTW() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("authorization")
-			tk := &model.Token{}
-			_, err := jwt.ParseWithClaims(header, tk, func(token *jwt.Token) (interface{}, error) {
-				return []byte("secret"), nil
-			})
+			user, err := auth.Validate(header)
 			if err != nil {
 				messageResponseJSON(w, http.StatusBadRequest, errUnauthorised.Error())
 				return
 			}
-			ctx := context.WithValue(r.Context(), userID, tk.EncodedID)
+			ctx := context.WithValue(r.Context(), userID, user.EncodedID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

@@ -3,50 +3,36 @@ package db
 import (
 	"errors"
 	"fmt"
-	"time"
 	"uacl/model"
+	"uacl/pkg/auth"
 
-	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 var (
-	errNoEmail            = errors.New("No email found in database!")
 	errInvalidCredentials = errors.New("Invalid login credentials. Please try again")
 )
 
-func FindOne(email, password string, database *gorm.DB) (map[string]interface{}, error) {
+func FindOne(email, password string, database *gorm.DB) (model.Token, error) {
 	user := &model.User{}
+	var token model.Token
 
 	if err := database.Where("email = ?", email).First(user).Error; err != nil {
-		return nil, errNoEmail
+		return token, errInvalidCredentials
 	}
 
-	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		fmt.Println(err.Error())
-		return nil, errInvalidCredentials
+		return token, errInvalidCredentials
 	}
 
-	tk := &model.Token{
-		EncodedID: user.EncodedID,
-		Name:      user.Name,
-		Email:     user.Email,
-		StandardClaims: &jwt.StandardClaims{
-			ExpiresAt: expiresAt,
-		},
+	tokenString, err := auth.CreateToken(*user)
+	if err != nil {
+		return token, err
 	}
 
-	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, error := token.SignedString([]byte("secret"))
-	if error != nil {
-		fmt.Println(error)
-	}
-
-	response := map[string]interface{}{
-		"token": tokenString,
-	}
-	return response, nil
+	token.Token = tokenString
+	return token, nil
 }

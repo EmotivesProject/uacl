@@ -13,8 +13,11 @@ func CreateRouter() chi.Router {
 	r.Route("/uacl/", func(r chi.Router) {
 		r.Get("/healthz", healthz)
 
-		r.Route("/create_user", func(r chi.Router) {
+		r.Get("/public_key", publicKey)
+
+		r.Route("/user", func(r chi.Router) {
 			r.Post("/", CreateUser)
+			// r.Put("/", UpdateUser)
 		})
 
 		r.Route("/login", func(r chi.Router) {

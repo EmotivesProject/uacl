@@ -3,17 +3,20 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"io/ioutil"
 	"net/http"
 	"uacl/internal/db"
 	"uacl/model"
+	"uacl/pkg/auth"
 	"uacl/pkg/encode"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 const (
-	encodePrefix = "USER"
+	encodePrefix      = "USER"
+	publicKeyLocation = "/app/jwt/public.key"
+	encodedIDLength   = 9
 )
 
 var (
@@ -26,10 +29,16 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	messageResponseJSON(w, http.StatusOK, "Health ok")
 }
 
-func FetchItems(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context().Value(userID)
-	fmt.Printf("Fetching information for %+v", ctx)
-	messageResponseJSON(w, http.StatusOK, "CONNECTED")
+func publicKey(w http.ResponseWriter, r *http.Request) {
+	public, err := ioutil.ReadFile(publicKeyLocation)
+	if err != nil {
+		messageResponseJSON(w, http.StatusInternalServerError, "Failed to find key")
+		return
+	}
+
+	resultResponseJSON(w, http.StatusOK, model.Key{
+		Key: string(public),
+	})
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +77,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encodedID, err := encode.GenerateBase64ID(8, encodePrefix)
+	encodedID, err := encode.GenerateBase64ID(encodedIDLength, encodePrefix)
 	if err != nil {
 		messageResponseJSON(w, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -77,6 +86,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	user.EncodedID = encodedID
 	database.Save(user)
 
-	user.Password = ""
-	resultResponseJSON(w, http.StatusCreated, user)
+	token, err := auth.CreateToken(*user)
+	if err != nil {
+		messageResponseJSON(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	resultResponseJSON(w, http.StatusCreated, token)
 }
