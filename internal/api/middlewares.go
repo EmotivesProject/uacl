@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"uacl/model"
 	"uacl/pkg/auth"
 )
 
@@ -23,7 +24,9 @@ func verifyJTW() func(http.Handler) http.Handler {
 			header := r.Header.Get("authorization")
 			user, err := auth.Validate(header)
 			if err != nil {
-				messageResponseJSON(w, http.StatusBadRequest, errUnauthorised.Error())
+				messageResponseJSON(w, http.StatusBadRequest, model.Message{
+					Message: errUnauthorised.Error(),
+				})
 				return
 			}
 			ctx := context.WithValue(r.Context(), userID, user.EncodedID)

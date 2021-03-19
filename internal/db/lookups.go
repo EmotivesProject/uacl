@@ -1,38 +1,18 @@
 package db
 
 import (
-	"errors"
-	"fmt"
 	"uacl/model"
-	"uacl/pkg/auth"
+	"uacl/pkg/uacl_errors"
 
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-var (
-	errInvalidCredentials = errors.New("Invalid login credentials. Please try again")
-)
-
-func FindOne(email, password string, database *gorm.DB) (model.Token, error) {
+func FindOne(email string, database *gorm.DB) (model.User, error) {
 	user := &model.User{}
-	var token model.Token
 
 	if err := database.Where("email = ?", email).First(user).Error; err != nil {
-		return token, errInvalidCredentials
+		return *user, uacl_errors.ErrInvalidCredentials
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		fmt.Println(err.Error())
-		return token, errInvalidCredentials
-	}
-
-	tokenString, err := auth.CreateToken(*user)
-	if err != nil {
-		return token, err
-	}
-
-	token.Token = tokenString
-	return token, nil
+	return *user, nil
 }

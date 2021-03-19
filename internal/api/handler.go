@@ -9,8 +9,8 @@ import (
 	"uacl/model"
 	"uacl/pkg/auth"
 	"uacl/pkg/encode"
-
-	"golang.org/x/crypto/bcrypt"
+	"uacl/pkg/password"
+	"uacl/pkg/uacl_errors"
 )
 
 const (
@@ -26,13 +26,13 @@ var (
 )
 
 func healthz(w http.ResponseWriter, r *http.Request) {
-	messageResponseJSON(w, http.StatusOK, "Health ok")
+	messageResponseJSON(w, http.StatusOK, model.Message{Message: "Health ok"})
 }
 
 func publicKey(w http.ResponseWriter, r *http.Request) {
 	public, err := ioutil.ReadFile(publicKeyLocation)
 	if err != nil {
-		messageResponseJSON(w, http.StatusInternalServerError, "Failed to find key")
+		messageResponseJSON(w, http.StatusInternalServerError, model.Message{Message: "Failed to find key"})
 		return
 	}
 
@@ -45,51 +45,85 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
-		messageResponseJSON(w, http.StatusBadRequest, errFailedDecoding.Error())
+		messageResponseJSON(w, http.StatusBadRequest, model.Message{Message: errFailedDecoding.Error()})
 		return
 	}
-	resp, err := db.FindOne(user.Email, user.Password, database)
+
+	target, err := user.ValidateLogin()
 	if err != nil {
-		messageResponseJSON(w, http.StatusUnprocessableEntity, err.Error())
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{
+			Message: err.Error(),
+			Target:  target,
+		})
 		return
 	}
-	resultResponseJSON(w, http.StatusCreated, resp)
+
+	databaseUser, err := db.FindOne(user.Email, database)
+	if err != nil {
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
+		return
+	}
+
+	correctPassword := password.ValidatePassword(user.Password, databaseUser.Password)
+	if !correctPassword {
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: uacl_errors.ErrInvalidCredentials.Error()})
+		return
+	}
+
+	passTokenToUser(w, user)
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
-		messageResponseJSON(w, http.StatusBadRequest, errFailedDecoding.Error())
+		messageResponseJSON(w, http.StatusBadRequest, model.Message{Message: errFailedDecoding.Error()})
 		return
 	}
 
-	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	target, err := user.ValidateCreate()
 	if err != nil {
-		messageResponseJSON(w, http.StatusUnprocessableEntity, errFailedCrypting.Error())
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{
+			Message: err.Error(),
+			Target:  target,
+		})
 		return
 	}
-	user.Password = string(pass)
+
+	encryptedPassword := password.CreatePassword(user.Password)
+	if encryptedPassword == "" {
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: errFailedCrypting.Error()})
+		return
+	}
+	user.Password = encryptedPassword
 
 	createdUser := database.Create(user)
 	if createdUser.Error != nil {
-		messageResponseJSON(w, http.StatusUnprocessableEntity, createdUser.Error.Error())
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: createdUser.Error.Error()})
 		return
 	}
 
 	encodedID, err := encode.GenerateBase64ID(encodedIDLength, encodePrefix)
 	if err != nil {
-		messageResponseJSON(w, http.StatusUnprocessableEntity, err.Error())
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
 		return
 	}
 	encodedID = encodedID[:len(encodedID)-1]
 	user.EncodedID = encodedID
 	database.Save(user)
 
-	token, err := auth.CreateToken(*user)
+	passTokenToUser(w, user)
+}
+
+func passTokenToUser(w http.ResponseWriter, user *model.User) {
+	tokenString, err := auth.CreateToken(*user)
 	if err != nil {
-		messageResponseJSON(w, http.StatusUnprocessableEntity, err.Error())
+		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
 		return
+	}
+
+	token := model.Token{
+		Token: tokenString,
 	}
 
 	resultResponseJSON(w, http.StatusCreated, token)

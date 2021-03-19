@@ -15,9 +15,9 @@ func resultResponseJSON(w http.ResponseWriter, status int, result interface{}) {
 	responseJSON(w, status, response)
 }
 
-func messageResponseJSON(w http.ResponseWriter, status int, message string) {
+func messageResponseJSON(w http.ResponseWriter, status int, message model.Message) {
 	response := model.Response{
-		Message: &message,
+		Message: []model.Message{message},
 	}
 
 	responseJSON(w, status, response)
