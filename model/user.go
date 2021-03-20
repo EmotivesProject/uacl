@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"regexp"
 	"time"
 	"uacl/pkg/uacl_errors"
@@ -49,11 +50,12 @@ func (u User) ValidateLogin() (string, error) {
 	if err := isPasswordValid(u.Password); err != nil {
 		return passwordField, err
 	}
+	fmt.Println(u.Password)
 	return noField, nil
 }
 
 func isNameValid(e string) error {
-	if len(e) < 3 && len(e) > 100 {
+	if len(e) < 3 || len(e) > 100 {
 		return uacl_errors.ErrInvalidEmailOrNameLength
 	}
 	if !generalCharacters.MatchString(e) {
@@ -63,7 +65,7 @@ func isNameValid(e string) error {
 }
 
 func isEmailValid(e string) error {
-	if len(e) < 3 && len(e) > 100 {
+	if len(e) < 3 || len(e) > 100 {
 		return uacl_errors.ErrInvalidEmailOrNameLength
 	}
 	if !emailRegex.MatchString(e) {
@@ -73,7 +75,7 @@ func isEmailValid(e string) error {
 }
 
 func isPasswordValid(e string) error {
-	if len(e) < 3 && len(e) > 100 {
+	if len(e) < 6 || len(e) > 100 {
 		return uacl_errors.ErrInvalidPasswordLength
 	}
 	if !generalCharacters.MatchString(e) {
