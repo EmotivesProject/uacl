@@ -10,17 +10,21 @@ func CreateRouter() chi.Router {
 
 	r.Use(SimpleMiddleware())
 
-	r.Route("/uacl/", func(r chi.Router) {
+	r.Route("/", func(r chi.Router) {
 		r.Get("/healthz", healthz)
 
 		r.Get("/public_key", publicKey)
 
 		r.Route("/user", func(r chi.Router) {
-			r.Post("/", CreateUser)
+			r.Post("/", createUser)
+
+			r.Route("/{encoded_id}", func(r chi.Router) {
+				r.Get("/", getUserByEncodedID)
+			})
 		})
 
 		r.Route("/login", func(r chi.Router) {
-			r.Post("/", Login)
+			r.Post("/", login)
 		})
 
 	})

@@ -11,6 +11,8 @@ import (
 	"uacl/pkg/encode"
 	"uacl/pkg/password"
 	"uacl/pkg/uacl_errors"
+
+	"github.com/go-chi/chi"
 )
 
 const (
@@ -41,7 +43,22 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func getUserByEncodedID(w http.ResponseWriter, r *http.Request) {
+	encodedID := chi.URLParam(r, "encoded_id")
+	user, err := db.FindByEncodedID(encodedID, database)
+	if err != nil {
+		messageResponseJSON(w, http.StatusBadRequest, model.Message{Message: "Failed to find user"})
+		return
+	}
+
+	resultResponseJSON(w, http.StatusOK, model.ShortenedUser{
+		Name:      user.Name,
+		Email:     user.Email,
+		EncodedID: user.EncodedID,
+	})
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
@@ -58,7 +75,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	databaseUser, err := db.FindOne(user.Email, database)
+	databaseUser, err := db.FindByEmail(user.Email, database)
 	if err != nil {
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
 		return
@@ -73,7 +90,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	passTokenToUser(w, user)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func createUser(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
