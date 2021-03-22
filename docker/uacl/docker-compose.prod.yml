@@ -3,11 +3,11 @@ version: '3'
 services:
   api:
     build:
-      context: ../.
-      dockerfile: docker/Dockerfile.prod
+      context: ../../.
+      dockerfile: docker/uacl/Dockerfile.prod
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ../:/app
+      - ../../:/app
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.uacl.rule=Host(`api.emotives.net`)"

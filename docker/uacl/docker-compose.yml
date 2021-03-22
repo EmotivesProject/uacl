@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: ../../.
+      dockerfile: docker/uacl/Dockerfile
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../../:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.uacl.rule=Host(`api.localhost`)"
+      - "traefik.http.routers.uacl.entrypoints=web"
+      - "traefik.docker.network=traefik"
+    networks:
+      traefik:
+      default:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: tom123
+      POSTGRES_USER: tom
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+      - ../../database/Initial/:/docker-entrypoint-initdb.d/
+    networks:
+      default:
+
+volumes:
+  database-data:
+
+networks:
+  default:
+  traefik:
+    external:
+      name: traefik

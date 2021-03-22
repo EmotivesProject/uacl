@@ -1,3 +1,5 @@
+\c uacl_db;
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(56) NOT NULL,
@@ -7,3 +9,5 @@ CREATE TABLE users (
 	updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	encoded_id VARCHAR(128) UNIQUE NOT NULL
 );
+
+ALTER TABLE users ADD CONSTRAINT email_unqiue UNIQUE (email)
