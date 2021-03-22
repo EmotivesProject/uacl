@@ -8,6 +8,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ../../:/app
+    environment:
+      - BASE_HOST=http://
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.uacl.rule=Host(`uacl.localhost`)"
@@ -17,6 +19,9 @@ services:
     networks:
       traefik:
       default:
+      emotives:
+        aliases:
+          - uacl
   db:
     image: postgres
     environment:
@@ -33,6 +38,9 @@ volumes:
   postgres-data:
 
 networks:
+  emotives:
+    external:
+      name: emotives
   default:
   traefik:
     external:

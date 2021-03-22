@@ -1,10 +1,13 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"uacl/internal/db"
 	"uacl/model"
 	"uacl/pkg/auth"
@@ -125,11 +128,34 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
 		return
 	}
+
 	encodedID = encodedID[:len(encodedID)-1]
 	user.EncodedID = encodedID
 	database.Save(user)
 
+	sendUserToPostit(user)
+
 	passTokenToUser(w, user)
+}
+
+func sendUserToPostit(user *model.User) {
+	baseHost := os.Getenv("BASE_HOST")
+	postitURL := baseHost + "postit/user"
+
+	// Clear the id since postit will create a new one
+	user.ID = 0
+	requestBody, err := json.Marshal(user)
+	if err != nil {
+		fmt.Println("FAILED TO SEND NEW USER")
+	}
+	fmt.Println(string(requestBody))
+
+	_, err = http.Post(postitURL, "application/json", bytes.NewBuffer(requestBody))
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("FAILED TO SEND NEW USER")
+	}
+	fmt.Println("Sent user to postit")
 }
 
 func passTokenToUser(w http.ResponseWriter, user *model.User) {
