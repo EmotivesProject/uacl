@@ -11,7 +11,7 @@ import (
 type key string
 
 const (
-	userID key = "empty"
+	userID key = "encodedID"
 )
 
 var (

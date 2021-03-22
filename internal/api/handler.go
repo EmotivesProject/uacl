@@ -87,7 +87,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	passTokenToUser(w, user)
+	passTokenToUser(w, &databaseUser)
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"regexp"
 	"time"
 	"uacl/pkg/uacl_errors"
@@ -50,7 +49,6 @@ func (u User) ValidateLogin() (string, error) {
 	if err := isPasswordValid(u.Password); err != nil {
 		return passwordField, err
 	}
-	fmt.Println(u.Password)
 	return noField, nil
 }
 
