@@ -13,6 +13,7 @@ services:
       - "traefik.http.routers.uacl.rule=Host(`api.localhost`)"
       - "traefik.http.routers.uacl.entrypoints=web"
       - "traefik.docker.network=traefik"
+    restart: unless-stopped
     networks:
       traefik:
       default:
@@ -22,13 +23,14 @@ services:
       POSTGRES_PASSWORD: tom123
       POSTGRES_USER: tom
     volumes:
-      - database-data:/var/lib/postgresql/data/
+      - postgres-data:/var/lib/postgresql/data/
       - ../../database/Initial/:/docker-entrypoint-initdb.d/
+    restart: unless-stopped
     networks:
       default:
 
 volumes:
-  database-data:
+  postgres-data:
 
 networks:
   default:

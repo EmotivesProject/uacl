@@ -13,10 +13,27 @@ services:
       - "traefik.http.routers.uacl.rule=Host(`api.emotives.net`)"
       - "traefik.http.routers.uacl.tls=true"
       - "traefik.http.routers.uacl.tls.certresolver=letsencrypt"
+    restart: unless-stopped
     networks:
       traefik:
+      default:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: tom123
+      POSTGRES_USER: tom
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+      - ../../database/Initial/:/docker-entrypoint-initdb.d/
+    restart: unless-stopped
+    networks:
+      default:
+
+volumes:
+  postgres-data:
 
 networks:
+  default:
   traefik:
     external:
       name: traefik
