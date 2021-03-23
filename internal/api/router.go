@@ -15,6 +15,8 @@ func CreateRouter() chi.Router {
 
 		r.Get("/public_key", publicKey)
 
+		r.Get("/authorize", authorizeHeader)
+
 		r.Route("/user", func(r chi.Router) {
 			r.Post("/", createUser)
 

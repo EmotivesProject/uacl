@@ -45,6 +45,20 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Should also refresh if required
+func authorizeHeader(w http.ResponseWriter, r *http.Request) {
+	header := r.Header.Get("authorization")
+	user, err := auth.Validate(header)
+	if err != nil {
+		messageResponseJSON(w, http.StatusBadRequest, model.Message{
+			Message: errUnauthorised.Error(),
+		})
+		return
+	}
+	fmt.Println("AUTHORIZING" + user.Username)
+	resultResponseJSON(w, http.StatusOK, user)
+}
+
 func getUserByEncodedID(w http.ResponseWriter, r *http.Request) {
 	encodedID := chi.URLParam(r, "username")
 	user, err := db.FindByUsername(encodedID, database)
@@ -136,7 +150,6 @@ func sendUserToPostit(user *model.User) {
 	if err != nil {
 		fmt.Println("FAILED TO SEND NEW USER")
 	}
-	fmt.Println(string(requestBody))
 
 	_, err = http.Post(postitURL, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
