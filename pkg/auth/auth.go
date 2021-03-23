@@ -21,9 +21,8 @@ func CreateToken(user model.User) (string, error) {
 	now := time.Now().UTC()
 
 	short := model.ShortenedUser{
-		Name:      user.Name,
-		Email:     user.Email,
-		EncodedID: user.EncodedID,
+		Name:     user.Name,
+		Username: user.Username,
 	}
 
 	claims := make(jwt.MapClaims)

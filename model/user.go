@@ -8,43 +8,45 @@ import (
 
 const (
 	nameField     = "Name"
-	emailField    = "Email"
+	usernameField = "Username"
 	passwordField = "Password"
 	noField       = ""
 )
 
 var (
 	generalCharacters = regexp.MustCompile("[A-Za-z0-9 _]")
-	emailRegex        = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
 //User struct declaration
 type User struct {
 	ID        int       `json:"id,omitempty" gorm:"primaryKey"`
 	Name      string    `json:"name"`
-	Email     string    `json:"email"`
+	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"created_time" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_time" gorm:"autoUpdateTime"`
-	EncodedID string    `json:"encoded_id"`
+	Secret    string    `json:"secret" gorm:"-"`
 }
 
 func (u User) ValidateCreate() (string, error) {
 	if err := isNameValid(u.Name); err != nil {
 		return nameField, err
 	}
-	if err := isEmailValid(u.Email); err != nil {
-		return emailField, err
+	if err := isUsernameValid(u.Username); err != nil {
+		return usernameField, err
 	}
 	if err := isPasswordValid(u.Password); err != nil {
 		return passwordField, err
+	}
+	if err := isSecretValid(u.Secret); err != nil {
+		return noField, err
 	}
 	return noField, nil
 }
 
 func (u User) ValidateLogin() (string, error) {
-	if err := isEmailValid(u.Email); err != nil {
-		return emailField, err
+	if err := isUsernameValid(u.Username); err != nil {
+		return usernameField, err
 	}
 	if err := isPasswordValid(u.Password); err != nil {
 		return passwordField, err
@@ -54,20 +56,20 @@ func (u User) ValidateLogin() (string, error) {
 
 func isNameValid(e string) error {
 	if len(e) < 3 || len(e) > 100 {
-		return uacl_errors.ErrInvalidEmailOrNameLength
+		return uacl_errors.ErrInvalidUsernameOrNameLength
 	}
 	if !generalCharacters.MatchString(e) {
-		return uacl_errors.ErrInvalidNameOrPassword
+		return uacl_errors.ErrInvalidCharacter
 	}
 	return nil
 }
 
-func isEmailValid(e string) error {
+func isUsernameValid(e string) error {
 	if len(e) < 3 || len(e) > 100 {
-		return uacl_errors.ErrInvalidEmailOrNameLength
+		return uacl_errors.ErrInvalidUsernameOrNameLength
 	}
-	if !emailRegex.MatchString(e) {
-		return uacl_errors.ErrInvalidEmail
+	if !generalCharacters.MatchString(e) {
+		return uacl_errors.ErrInvalidCharacter
 	}
 	return nil
 }
@@ -77,7 +79,14 @@ func isPasswordValid(e string) error {
 		return uacl_errors.ErrInvalidPasswordLength
 	}
 	if !generalCharacters.MatchString(e) {
-		return uacl_errors.ErrInvalidNameOrPassword
+		return uacl_errors.ErrInvalidCharacter
+	}
+	return nil
+}
+
+func isSecretValid(e string) error {
+	if e != "qutCreate" {
+		return uacl_errors.ErrInvalidSecret
 	}
 	return nil
 }

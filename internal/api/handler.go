@@ -11,7 +11,6 @@ import (
 	"uacl/internal/db"
 	"uacl/model"
 	"uacl/pkg/auth"
-	"uacl/pkg/encode"
 	"uacl/pkg/password"
 	"uacl/pkg/uacl_errors"
 
@@ -47,17 +46,16 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserByEncodedID(w http.ResponseWriter, r *http.Request) {
-	encodedID := chi.URLParam(r, "encoded_id")
-	user, err := db.FindByEncodedID(encodedID, database)
+	encodedID := chi.URLParam(r, "username")
+	user, err := db.FindByUsername(encodedID, database)
 	if err != nil {
 		messageResponseJSON(w, http.StatusBadRequest, model.Message{Message: "Failed to find user"})
 		return
 	}
 
 	resultResponseJSON(w, http.StatusOK, model.ShortenedUser{
-		Name:      user.Name,
-		Email:     user.Email,
-		EncodedID: user.EncodedID,
+		Name:     user.Name,
+		Username: user.Username,
 	})
 }
 
@@ -78,7 +76,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	databaseUser, err := db.FindByEmail(user.Email, database)
+	databaseUser, err := db.FindByUsername(user.Username, database)
 	if err != nil {
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
 		return
@@ -122,16 +120,6 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: createdUser.Error.Error()})
 		return
 	}
-
-	encodedID, err := encode.GenerateBase64ID(encodedIDLength, encodePrefix)
-	if err != nil {
-		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
-		return
-	}
-
-	encodedID = encodedID[:len(encodedID)-1]
-	user.EncodedID = encodedID
-	database.Save(user)
 
 	sendUserToPostit(user)
 

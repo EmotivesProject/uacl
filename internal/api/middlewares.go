@@ -11,7 +11,7 @@ import (
 type key string
 
 const (
-	userID key = "encodedID"
+	userID key = "username"
 )
 
 var (
@@ -29,7 +29,7 @@ func verifyJTW() func(http.Handler) http.Handler {
 				})
 				return
 			}
-			ctx := context.WithValue(r.Context(), userID, user.EncodedID)
+			ctx := context.WithValue(r.Context(), userID, user.Username)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
