@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"uacl/internal/db"
 	"uacl/model"
 	"uacl/pkg/auth"
@@ -48,6 +49,8 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 // Should also refresh if required
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	header := r.Header.Get("authorization")
+	header = strings.Split(header, "Bearer ")[1]
+
 	user, err := auth.Validate(header)
 	if err != nil {
 		messageResponseJSON(w, http.StatusBadRequest, model.Message{
