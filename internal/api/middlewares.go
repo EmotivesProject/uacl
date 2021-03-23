@@ -21,7 +21,7 @@ var (
 func verifyJTW() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			header := r.Header.Get("authorization")
+			header := r.Header.Get("Authorization")
 			user, err := auth.Validate(header)
 			if err != nil {
 				messageResponseJSON(w, http.StatusBadRequest, model.Message{

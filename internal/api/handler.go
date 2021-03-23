@@ -48,7 +48,7 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 
 // Should also refresh if required
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
-	header := r.Header.Get("authorization")
+	header := r.Header.Get("Authorization")
 	header = strings.Split(header, "Bearer ")[1]
 
 	user, err := auth.Validate(header)
