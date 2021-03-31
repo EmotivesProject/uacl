@@ -138,14 +138,15 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendUserToPostit(user)
+	sendUser(user, "postit/user")
+	sendUser(user, "chatter/user")
 
 	passTokenToUser(w, user)
 }
 
-func sendUserToPostit(user *model.User) {
+func sendUser(user *model.User, external_url string) {
 	baseHost := os.Getenv("BASE_HOST")
-	postitURL := baseHost + "postit/user"
+	url := baseHost + external_url
 
 	// Clear the id since postit will create a new one
 	user.ID = 0
@@ -154,12 +155,12 @@ func sendUserToPostit(user *model.User) {
 		fmt.Println("FAILED TO SEND NEW USER")
 	}
 
-	_, err = http.Post(postitURL, "application/json", bytes.NewBuffer(requestBody))
+	_, err = http.Post(url, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("FAILED TO SEND NEW USER")
 	}
-	fmt.Println("Sent user to postit")
+	fmt.Println("Sent user to " + url)
 }
 
 func passTokenToUser(w http.ResponseWriter, user *model.User) {
