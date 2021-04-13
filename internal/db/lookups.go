@@ -1,8 +1,8 @@
 package db
 
 import (
+	"uacl/internal/uacl_errors"
 	"uacl/model"
-	"uacl/pkg/uacl_errors"
 
 	"gorm.io/gorm"
 )

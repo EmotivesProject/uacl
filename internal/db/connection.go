@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"uacl/internal/logger"
 	"uacl/model"
 
 	"github.com/joho/godotenv"
@@ -11,11 +11,15 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	db *gorm.DB
+)
+
 //ConnectDB function: Make database connection
-func ConnectDB() *gorm.DB {
+func ConnectDB() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		logger.Fatal(err)
 	}
 
 	username := os.Getenv("databaseUser")
@@ -25,21 +29,23 @@ func ConnectDB() *gorm.DB {
 
 	//Define DB connection string and connect
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", databaseHost, username, databaseName, password)
-	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
+	connectedDb, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 	if err != nil {
-		fmt.Println("error", err)
-		panic(err)
+		logger.Fatal(err)
 	}
 
 	// Migrate the schema
-	err = db.AutoMigrate(
+	err = connectedDb.AutoMigrate(
 		&model.User{},
 	)
 	if err != nil {
-		fmt.Println("error", err)
-		panic(err)
+		logger.Fatal(err)
 	}
 
-	fmt.Println("Successfully connected to Database! ALL SYSTEMS ARE GO")
+	logger.Info("Successfully connected to the database")
+	db = connectedDb
+}
+
+func GetDB() *gorm.DB {
 	return db
 }

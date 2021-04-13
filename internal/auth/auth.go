@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"time"
+	"uacl/internal/logger"
 	"uacl/model"
 
 	"github.com/dgrijalva/jwt-go"
@@ -42,9 +43,9 @@ func CreateToken(user model.User) (string, error) {
 
 	tokenString, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
+	logger.Info("Successfully created token")
 	return tokenString, nil
 }
 
@@ -86,6 +87,8 @@ func Validate(token string) (model.ShortenedUser, error) {
 	if err != nil {
 		return shorten, err
 	}
+
+	logger.Info("Successfully validated token")
 
 	return shorten, nil
 }

@@ -1,7 +1,7 @@
 package password
 
 import (
-	"fmt"
+	"uacl/internal/logger"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,7 +12,7 @@ func ValidatePassword(givenPassword, databasePassword string) bool {
 		return false
 	}
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err)
 	}
 	return true
 }

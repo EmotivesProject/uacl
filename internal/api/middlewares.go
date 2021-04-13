@@ -1,39 +1,8 @@
 package api
 
 import (
-	"context"
-	"errors"
 	"net/http"
-	"uacl/model"
-	"uacl/pkg/auth"
 )
-
-type key string
-
-const (
-	userID key = "username"
-)
-
-var (
-	errUnauthorised = errors.New("Not authorised")
-)
-
-func verifyJTW() func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			header := r.Header.Get("Authorization")
-			user, err := auth.Validate(header)
-			if err != nil {
-				messageResponseJSON(w, http.StatusBadRequest, model.Message{
-					Message: errUnauthorised.Error(),
-				})
-				return
-			}
-			ctx := context.WithValue(r.Context(), userID, user.Username)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-}
 
 func SimpleMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {

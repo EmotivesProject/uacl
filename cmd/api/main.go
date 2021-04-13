@@ -6,11 +6,17 @@ import (
 	"os"
 
 	"uacl/internal/api"
+	"uacl/internal/db"
+	"uacl/internal/logger"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	logger.InitLogger()
+
+	db.ConnectDB()
+
 	router := api.CreateRouter()
 
 	err := godotenv.Load()

@@ -4,30 +4,28 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
+	"uacl/internal/auth"
 	"uacl/internal/db"
+	"uacl/internal/logger"
+	"uacl/internal/password"
+	"uacl/internal/uacl_errors"
 	"uacl/model"
-	"uacl/pkg/auth"
-	"uacl/pkg/password"
-	"uacl/pkg/uacl_errors"
 
 	"github.com/go-chi/chi"
 )
 
 const (
-	encodePrefix      = "USER"
 	publicKeyLocation = "/app/jwt/public.key"
-	encodedIDLength   = 9
 )
 
 var (
-	database          = db.ConnectDB()
 	errFailedDecoding = errors.New("Failed during decoding request")
 	errFailedCrypting = errors.New("Failed during encrypting password")
+	errUnauthorised   = errors.New("Unauthorized")
 )
 
 func healthz(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +34,7 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 
 func publicKey(w http.ResponseWriter, r *http.Request) {
 	public, err := ioutil.ReadFile(publicKeyLocation)
+	logger.Info("Fetching public key file")
 	if err != nil {
 		messageResponseJSON(w, http.StatusInternalServerError, model.Message{Message: "Failed to find key"})
 		return
@@ -53,23 +52,26 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 
 	user, err := auth.Validate(header)
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusBadRequest, model.Message{
 			Message: errUnauthorised.Error(),
 		})
 		return
 	}
-	fmt.Println("AUTHORIZING" + user.Username)
+	logger.Infof("Validating %s", user.Username)
 	resultResponseJSON(w, http.StatusOK, user)
 }
 
 func getUserByEncodedID(w http.ResponseWriter, r *http.Request) {
 	encodedID := chi.URLParam(r, "username")
-	user, err := db.FindByUsername(encodedID, database)
+	user, err := db.FindByUsername(encodedID, db.GetDB())
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusBadRequest, model.Message{Message: "Failed to find user"})
 		return
 	}
 
+	logger.Infof("Fetched user %s", user.Username)
 	resultResponseJSON(w, http.StatusOK, model.ShortenedUser{
 		Name:     user.Name,
 		Username: user.Username,
@@ -80,12 +82,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusBadRequest, model.Message{Message: errFailedDecoding.Error()})
 		return
 	}
 
 	target, err := user.ValidateLogin()
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{
 			Message: err.Error(),
 			Target:  target,
@@ -93,17 +97,20 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	databaseUser, err := db.FindByUsername(user.Username, database)
+	databaseUser, err := db.FindByUsername(user.Username, db.GetDB())
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
 		return
 	}
 
 	correctPassword := password.ValidatePassword(user.Password, databaseUser.Password)
 	if !correctPassword {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: uacl_errors.ErrInvalidCredentials.Error()})
 		return
 	}
+	logger.Infof("Logging in user %s", user.Username)
 
 	passTokenToUser(w, &databaseUser)
 }
@@ -112,12 +119,14 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusBadRequest, model.Message{Message: errFailedDecoding.Error()})
 		return
 	}
 
 	target, err := user.ValidateCreate()
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{
 			Message: err.Error(),
 			Target:  target,
@@ -127,19 +136,24 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	encryptedPassword := password.CreatePassword(user.Password)
 	if encryptedPassword == "" {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: errFailedCrypting.Error()})
 		return
 	}
 	user.Password = encryptedPassword
 
-	createdUser := database.Create(user)
+	createdUser := db.GetDB().Create(user)
 	if createdUser.Error != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: createdUser.Error.Error()})
 		return
 	}
+	logger.Infof("Created user %s", user.Username)
 
 	sendUser(user, "postit/user")
 	sendUser(user, "chatter/user")
+
+	logger.Info("Sent off user to various services")
 
 	passTokenToUser(w, user)
 }
@@ -152,20 +166,19 @@ func sendUser(user *model.User, external_url string) {
 	user.ID = 0
 	requestBody, err := json.Marshal(user)
 	if err != nil {
-		fmt.Println("FAILED TO SEND NEW USER")
+		logger.Error(err)
 	}
 
 	_, err = http.Post(url, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
-		fmt.Println(err.Error())
-		fmt.Println("FAILED TO SEND NEW USER")
+		logger.Error(err)
 	}
-	fmt.Println("Sent user to " + url)
 }
 
 func passTokenToUser(w http.ResponseWriter, user *model.User) {
 	tokenString, err := auth.CreateToken(*user)
 	if err != nil {
+		logger.Error(err)
 		messageResponseJSON(w, http.StatusUnprocessableEntity, model.Message{Message: err.Error()})
 		return
 	}

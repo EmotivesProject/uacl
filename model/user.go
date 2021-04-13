@@ -3,7 +3,7 @@ package model
 import (
 	"regexp"
 	"time"
-	"uacl/pkg/uacl_errors"
+	"uacl/internal/uacl_errors"
 )
 
 const (
