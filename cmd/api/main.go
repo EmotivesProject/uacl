@@ -7,13 +7,14 @@ import (
 
 	"uacl/internal/api"
 	"uacl/internal/db"
-	"uacl/internal/logger"
+
+	"github.com/TomBowyerResearchProject/common/logger"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	logger.InitLogger()
+	logger.InitLogger("uacl")
 
 	db.ConnectDB()
 

@@ -3,8 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"uacl/internal/logger"
 	"uacl/model"
+
+	"github.com/TomBowyerResearchProject/common/logger"
 )
 
 func resultResponseJSON(w http.ResponseWriter, status int, result interface{}) {

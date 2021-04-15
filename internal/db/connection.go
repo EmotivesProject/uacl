@@ -3,8 +3,9 @@ package db
 import (
 	"fmt"
 	"os"
-	"uacl/internal/logger"
 	"uacl/model"
+
+	"github.com/TomBowyerResearchProject/common/logger"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"

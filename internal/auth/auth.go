@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"time"
-	"uacl/internal/logger"
 	"uacl/model"
+
+	"github.com/TomBowyerResearchProject/common/logger"
 
 	"github.com/dgrijalva/jwt-go"
 )

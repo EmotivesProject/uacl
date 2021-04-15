@@ -1,19 +1,18 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"uacl/internal/auth"
 	"uacl/internal/db"
-	"uacl/internal/logger"
 	"uacl/internal/password"
 	"uacl/internal/uacl_errors"
 	"uacl/model"
+
+	"github.com/TomBowyerResearchProject/common/logger"
 
 	"github.com/go-chi/chi"
 )
@@ -150,29 +149,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Infof("Created user %s", user.Username)
 
-	sendUser(user, "postit/user")
-	sendUser(user, "chatter/user")
-
-	logger.Info("Sent off user to various services")
-
 	passTokenToUser(w, user)
-}
-
-func sendUser(user *model.User, external_url string) {
-	baseHost := os.Getenv("BASE_HOST")
-	url := baseHost + external_url
-
-	// Clear the id since postit will create a new one
-	user.ID = 0
-	requestBody, err := json.Marshal(user)
-	if err != nil {
-		logger.Error(err)
-	}
-
-	_, err = http.Post(url, "application/json", bytes.NewBuffer(requestBody))
-	if err != nil {
-		logger.Error(err)
-	}
 }
 
 func passTokenToUser(w http.ResponseWriter, user *model.User) {

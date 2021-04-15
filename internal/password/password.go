@@ -1,7 +1,7 @@
 package password
 
 import (
-	"uacl/internal/logger"
+	"github.com/TomBowyerResearchProject/common/logger"
 
 	"golang.org/x/crypto/bcrypt"
 )
