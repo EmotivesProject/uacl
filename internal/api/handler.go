@@ -14,8 +14,6 @@ import (
 
 	"github.com/TomBowyerResearchProject/common/logger"
 	"github.com/TomBowyerResearchProject/common/response"
-
-	"github.com/go-chi/chi"
 )
 
 const (
@@ -60,22 +58,6 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Infof("Validating %s", user.Username)
 	response.ResultResponseJSON(w, http.StatusOK, user)
-}
-
-func getUserByEncodedID(w http.ResponseWriter, r *http.Request) {
-	encodedID := chi.URLParam(r, "username")
-	user, err := db.FindByUsername(encodedID, db.GetDB())
-	if err != nil {
-		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: "Failed to find user"})
-		return
-	}
-
-	logger.Infof("Fetched user %s", user.Username)
-	response.ResultResponseJSON(w, http.StatusOK, model.ShortenedUser{
-		Name:     user.Name,
-		Username: user.Username,
-	})
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
