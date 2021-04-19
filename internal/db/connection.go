@@ -32,7 +32,7 @@ func ConnectDB() {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", databaseHost, username, databaseName, password)
 	connectedDb, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 	if err != nil {
-		logger.Fatal(err)
+		logger.Error(err)
 	}
 
 	// Migrate the schema
@@ -40,7 +40,7 @@ func ConnectDB() {
 		&model.User{},
 	)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Error(err)
 	}
 
 	logger.Info("Successfully connected to the database")
