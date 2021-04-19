@@ -16,8 +16,6 @@ import (
 func main() {
 	logger.InitLogger("uacl")
 
-	db.ConnectDB()
-
 	router := api.CreateRouter()
 
 	err := godotenv.Load()
@@ -26,6 +24,8 @@ func main() {
 	}
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
+
+	db.ConnectDB()
 
 	log.Fatal(http.ListenAndServe(host+":"+port, router))
 }
