@@ -15,6 +15,7 @@ services:
       - "traefik.http.routers.uacl.rule=Host(`uacl.emotives.net`)"
       - "traefik.http.routers.uacl.tls=true"
       - "traefik.http.routers.uacl.tls.certresolver=letsencrypt"
+      - "traefik.docker.network=traefik"
     restart: unless-stopped
     networks:
       traefik:
