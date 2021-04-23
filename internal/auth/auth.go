@@ -46,6 +46,7 @@ func CreateToken(user model.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	logger.Info("Successfully created token")
 	return tokenString, nil
 }

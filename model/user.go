@@ -3,7 +3,7 @@ package model
 import (
 	"regexp"
 	"time"
-	"uacl/internal/uacl_errors"
+	"uacl/messages"
 )
 
 const (
@@ -56,37 +56,37 @@ func (u User) ValidateLogin() (string, error) {
 
 func isNameValid(e string) error {
 	if len(e) < 3 || len(e) > 100 {
-		return uacl_errors.ErrInvalidUsernameOrNameLength
+		return messages.ErrInvalidUsernameOrNameLength
 	}
 	if !generalCharacters.MatchString(e) {
-		return uacl_errors.ErrInvalidCharacter
+		return messages.ErrInvalidCharacter
 	}
 	return nil
 }
 
 func isUsernameValid(e string) error {
 	if len(e) < 3 || len(e) > 100 {
-		return uacl_errors.ErrInvalidUsernameOrNameLength
+		return messages.ErrInvalidUsernameOrNameLength
 	}
 	if !generalCharacters.MatchString(e) {
-		return uacl_errors.ErrInvalidCharacter
+		return messages.ErrInvalidCharacter
 	}
 	return nil
 }
 
 func isPasswordValid(e string) error {
 	if len(e) < 6 || len(e) > 100 {
-		return uacl_errors.ErrInvalidPasswordLength
+		return messages.ErrInvalidPasswordLength
 	}
 	if !generalCharacters.MatchString(e) {
-		return uacl_errors.ErrInvalidCharacter
+		return messages.ErrInvalidCharacter
 	}
 	return nil
 }
 
 func isSecretValid(e string) error {
 	if e != "qutCreate" {
-		return uacl_errors.ErrInvalidSecret
+		return messages.ErrInvalidSecret
 	}
 	return nil
 }

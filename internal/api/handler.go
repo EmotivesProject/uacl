@@ -2,14 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"uacl/internal/auth"
 	"uacl/internal/db"
 	"uacl/internal/password"
-	"uacl/internal/uacl_errors"
+	"uacl/messages"
 	"uacl/model"
 
 	"github.com/TomBowyerResearchProject/common/logger"
@@ -20,21 +19,16 @@ const (
 	publicKeyLocation = "/app/jwt/public.key"
 )
 
-var (
-	errFailedDecoding = errors.New("Failed during decoding request")
-	errFailedCrypting = errors.New("Failed during encrypting password")
-	errUnauthorised   = errors.New("Unauthorized")
-)
-
 func healthz(w http.ResponseWriter, r *http.Request) {
-	response.MessageResponseJSON(w, http.StatusOK, response.Message{Message: "Health ok"})
+	response.MessageResponseJSON(w, http.StatusOK, response.Message{Message: messages.HealthResponse})
 }
 
 func publicKey(w http.ResponseWriter, r *http.Request) {
 	public, err := ioutil.ReadFile(publicKeyLocation)
-	logger.Info("Fetching public key file")
+
 	if err != nil {
-		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: "Failed to find key"})
+		logger.Error(err)
+		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
 		return
 	}
 
@@ -52,10 +46,11 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{
-			Message: errUnauthorised.Error(),
+			Message: messages.ErrUnauthorised.Error(),
 		})
 		return
 	}
+
 	logger.Infof("Validating %s", user.Username)
 	response.ResultResponseJSON(w, http.StatusOK, user)
 }
@@ -65,7 +60,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: errFailedDecoding.Error()})
+		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: err.Error()})
 		return
 	}
 
@@ -89,9 +84,10 @@ func login(w http.ResponseWriter, r *http.Request) {
 	correctPassword := password.ValidatePassword(user.Password, databaseUser.Password)
 	if !correctPassword {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: uacl_errors.ErrInvalidCredentials.Error()})
+		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: messages.ErrInvalidCredentials.Error()})
 		return
 	}
+
 	logger.Infof("Logging in user %s", user.Username)
 
 	passTokenToUser(w, &databaseUser)
@@ -102,7 +98,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: errFailedDecoding.Error()})
+		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: err.Error()})
 		return
 	}
 
@@ -119,7 +115,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	encryptedPassword := password.CreatePassword(user.Password)
 	if encryptedPassword == "" {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: errFailedCrypting.Error()})
+		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
 		return
 	}
 	user.Password = encryptedPassword
@@ -130,6 +126,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: createdUser.Error.Error()})
 		return
 	}
+
 	logger.Infof("Created user %s", user.Username)
 
 	passTokenToUser(w, user)

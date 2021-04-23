@@ -9,12 +9,19 @@ import (
 	"uacl/internal/db"
 
 	"github.com/TomBowyerResearchProject/common/logger"
+	"github.com/TomBowyerResearchProject/common/middlewares"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	logger.InitLogger("uacl")
+
+	middlewares.Init(middlewares.Config{
+		AllowedOrigin:  "*",
+		AllowedMethods: "GET,POST,OPTIONS",
+		AllowedHeaders: "Accept, Content-Type, Content-Length, Authorization, Access-Control-Request-Headers, Access-Control-Request-Method, Connection, Host, Origin, User-Agent, Referer, Cache-Control, X-header",
+	})
 
 	router := api.CreateRouter()
 
