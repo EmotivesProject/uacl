@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"uacl/internal/api"
-	"uacl/internal/db"
 
 	"github.com/TomBowyerResearchProject/common/logger"
 	"github.com/TomBowyerResearchProject/common/middlewares"
+	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
 
 	"github.com/joho/godotenv"
 )
@@ -32,7 +32,9 @@ func main() {
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
 
-	db.ConnectDB()
+	commonPostgres.Connect(commonPostgres.Config{
+		URI: os.Getenv("databaseURL"),
+	})
 
 	log.Fatal(http.ListenAndServe(host+":"+port, router))
 }

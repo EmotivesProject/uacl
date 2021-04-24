@@ -6,12 +6,13 @@ import (
 	"uacl/model"
 
 	"github.com/TomBowyerResearchProject/common/logger"
+	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
 )
 
 func CreateNewUser(user *model.User) error {
 	logger.Info("Creating new user")
 
-	db = GetDB()
+	db := commonPostgres.GetDatabase()
 
 	_, err := db.Exec(
 		context.Background(),
