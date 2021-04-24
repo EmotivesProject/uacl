@@ -1,52 +1,38 @@
 package db
 
 import (
-	"fmt"
+	"context"
 	"os"
-	"uacl/model"
 
 	"github.com/TomBowyerResearchProject/common/logger"
+	"github.com/jackc/pgx/v4"
 
 	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 var (
-	db *gorm.DB
+	db *pgx.Conn
 )
 
 //ConnectDB function: Make database connection
 func ConnectDB() {
 	err := godotenv.Load()
 	if err != nil {
-		logger.Fatal(err)
-	}
-
-	username := os.Getenv("databaseUser")
-	password := os.Getenv("databasePassword")
-	databaseName := os.Getenv("databaseName")
-	databaseHost := os.Getenv("databaseHost")
-
-	//Define DB connection string and connect
-	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", databaseHost, username, databaseName, password)
-	connectedDb, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
-	if err != nil {
 		logger.Error(err)
 	}
 
-	// Migrate the schema
-	err = connectedDb.AutoMigrate(
-		&model.User{},
-	)
+	databaseURL := os.Getenv("databaseURL")
+
+	//Define DB connection string and connect
+	conn, err := pgx.Connect(context.Background(), databaseURL)
 	if err != nil {
 		logger.Error(err)
 	}
 
 	logger.Info("Successfully connected to the database")
-	db = connectedDb
+	db = conn
 }
 
-func GetDB() *gorm.DB {
+func GetDB() *pgx.Conn {
 	return db
 }

@@ -74,7 +74,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	databaseUser, err := db.FindByUsername(user.Username, db.GetDB())
+	databaseUser, err := db.FindByUsername(user.Username)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
@@ -120,10 +120,10 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Password = encryptedPassword
 
-	createdUser := db.GetDB().Create(user)
-	if createdUser.Error != nil {
+	err = db.CreateNewUser(user)
+	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: createdUser.Error.Error()})
+		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
 		return
 	}
 

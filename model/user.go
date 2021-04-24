@@ -19,13 +19,13 @@ var (
 
 //User struct declaration
 type User struct {
-	ID        int       `json:"id,omitempty" gorm:"primaryKey"`
+	ID        int       `json:"id,omitempty"`
 	Name      string    `json:"name"`
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"created_time" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_time" gorm:"autoUpdateTime"`
-	Secret    string    `json:"secret" gorm:"-"`
+	CreatedAt time.Time `json:"created_time"`
+	UpdatedAt time.Time `json:"updated_time"`
+	Secret    string    `json:"secret"`
 }
 
 func (u User) ValidateCreate() (string, error) {
