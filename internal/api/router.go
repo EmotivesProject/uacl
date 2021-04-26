@@ -5,7 +5,6 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// can also do r.Use(authorizationMiddleware()) and r.With(authorization)
 func CreateRouter() chi.Router {
 	r := chi.NewRouter()
 
@@ -25,7 +24,6 @@ func CreateRouter() chi.Router {
 		r.Route("/login", func(r chi.Router) {
 			r.Post("/", login)
 		})
-
 	})
 
 	return r

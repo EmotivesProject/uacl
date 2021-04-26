@@ -15,9 +15,7 @@ import (
 	"github.com/TomBowyerResearchProject/common/response"
 )
 
-const (
-	publicKeyLocation = "/app/jwt/public.key"
-)
+const publicKeyLocation = "/app/jwt/public.key"
 
 func healthz(w http.ResponseWriter, r *http.Request) {
 	response.MessageResponseJSON(w, http.StatusOK, response.Message{Message: messages.HealthResponse})
@@ -25,10 +23,10 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 
 func publicKey(w http.ResponseWriter, r *http.Request) {
 	public, err := ioutil.ReadFile(publicKeyLocation)
-
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
 		return
 	}
 
@@ -37,7 +35,7 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Should also refresh if required
+// Should also refresh if required.
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	header := r.Header.Get("Authorization")
 	header = strings.Split(header, "Bearer ")[1]
@@ -48,6 +46,7 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{
 			Message: messages.ErrUnauthorised.Error(),
 		})
+
 		return
 	}
 
@@ -57,10 +56,10 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 
 func login(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
-	err := json.NewDecoder(r.Body).Decode(user)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: err.Error()})
+
 		return
 	}
 
@@ -71,6 +70,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 			Message: err.Error(),
 			Target:  target,
 		})
+
 		return
 	}
 
@@ -78,13 +78,17 @@ func login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+
 		return
 	}
 
 	correctPassword := password.ValidatePassword(user.Password, databaseUser.Password)
 	if !correctPassword {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: messages.ErrInvalidCredentials.Error()})
+		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{
+			Message: messages.ErrInvalidCredentials.Error(),
+		})
+
 		return
 	}
 
@@ -95,10 +99,10 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 func createUser(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
-	err := json.NewDecoder(r.Body).Decode(user)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: err.Error()})
+
 		return
 	}
 
@@ -109,6 +113,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 			Message: err.Error(),
 			Target:  target,
 		})
+
 		return
 	}
 
@@ -116,14 +121,17 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	if encryptedPassword == "" {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+
 		return
 	}
+
 	user.Password = encryptedPassword
 
 	err = db.CreateNewUser(user)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+
 		return
 	}
 
@@ -137,6 +145,7 @@ func passTokenToUser(w http.ResponseWriter, user *model.User) {
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+
 		return
 	}
 

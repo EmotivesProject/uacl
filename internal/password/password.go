@@ -1,6 +1,8 @@
 package password
 
 import (
+	"errors"
+
 	"github.com/TomBowyerResearchProject/common/logger"
 
 	"golang.org/x/crypto/bcrypt"
@@ -8,12 +10,14 @@ import (
 
 func ValidatePassword(givenPassword, databasePassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(databasePassword), []byte(givenPassword))
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+	if err != nil && errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 		return false
 	}
+
 	if err != nil {
 		logger.Error(err)
 	}
+
 	return true
 }
 
@@ -22,5 +26,6 @@ func CreatePassword(password string) string {
 	if err != nil {
 		return ""
 	}
+
 	return string(encryptedPassword)
 }
