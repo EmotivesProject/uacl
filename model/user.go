@@ -13,7 +13,7 @@ const (
 	noField       = ""
 )
 
-var generalCharacters = regexp.MustCompile("[A-Za-z0-9 _]")
+var generalCharacters = regexp.MustCompile("^[A-Za-z0-9 _]+$")
 
 // User struct declaration.
 type User struct {
