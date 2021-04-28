@@ -1,7 +1,7 @@
 # NOTE: if you want to use github as opposed to my self hosted option for running test
 # add a os in the matrix such as os: [ubuntu-latest] and then change runs-on to ${{ matrix.os }}
 on: [push, pull_request]
-name: Test
+name: Lint and Test
 jobs:
   full-run:
     strategy:

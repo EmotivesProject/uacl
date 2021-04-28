@@ -1,18 +1,23 @@
-# Build docker images and ssh onto machine and deploy
-name: Merge PR
+name: Merged items
+
+# only trigger on pull request closed events
 on:
   pull_request:
-    types: [closed]
+    types: [ closed ]
+
 jobs:
-  build-images:
+  merge_job:
+    # this job will only run if the PR has been merged
     if: github.event.pull_request.merged == true
     runs-on: self-hosted
     steps:
-      - name: Dump GitHub context
-        run: echo yo
-  update-images:
-    if: github.event.pull_request.merged == true
+    - run: |
+        echo PR #${{ github.event.number }} has been merged
+
+  close_job:
+    # this job will only run if the PR has been closed without being merged
+    if: github.event.pull_request.merged == false
     runs-on: self-hosted
     steps:
-      - name: Dump GitHub context
-        run: echo yo
+    - run: |
+        echo PR #${{ github.event.number }} has been closed without being merged
