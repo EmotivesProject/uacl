@@ -1,0 +1,22 @@
+# Build docker images and ssh onto machine and deploy
+name: Merge PR
+on:
+  pull_request:
+    types: [closed]
+jobs:
+  build-images:
+    if: github.event.pull_request.merged == true
+    runs-on: self-hosted
+    steps:
+      - name: Dump GitHub context
+         env:
+           GITHUB_CONTEXT: ${{ toJson(github) }}
+         run: echo "$GITHUB_CONTEXT"
+  update-images:
+    if: github.event.pull_request.merged == true
+    runs-on: self-hosted
+    steps:
+      - name: Dump GitHub context
+         env:
+           GITHUB_CONTEXT: ${{ toJson(github) }}
+         run: echo "$GITHUB_CONTEXT"
