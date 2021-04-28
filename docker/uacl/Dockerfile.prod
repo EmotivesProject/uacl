@@ -1,4 +1,6 @@
-FROM golang:1.16.0-alpine3.13
+FROM golang:alpine AS builder
+
+RUN apk update && apk add --no-cache git
 
 RUN mkdir /app
 
@@ -10,5 +12,11 @@ RUN go mod download
 
 RUN go build ./cmd/api
 
+FROM scratch
+
+COPY --from=builder /app/api /app/api
+COPY --from=builder /app/jwt/ /app/jwt/
+
 EXPOSE 80
+
 CMD ["/app/api"]
