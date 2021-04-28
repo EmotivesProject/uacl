@@ -15,3 +15,8 @@ https://stackoverflow.com/questions/25965584/separating-unit-tests-and-integrati
 http://peter.bourgon.org/go-in-production/#testing-and-validation
 
 https://stackoverflow.com/questions/23729790/how-can-i-do-test-setup-using-the-testing-package-in-go
+
+
+docker login
+
+imthetom
