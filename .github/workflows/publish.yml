@@ -9,14 +9,10 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Dump GitHub context
-         env:
-           GITHUB_CONTEXT: ${{ toJson(github) }}
-         run: echo "$GITHUB_CONTEXT"
+        run: echo yo
   update-images:
     if: github.event.pull_request.merged == true
     runs-on: self-hosted
     steps:
       - name: Dump GitHub context
-         env:
-           GITHUB_CONTEXT: ${{ toJson(github) }}
-         run: echo "$GITHUB_CONTEXT"
+        run: echo yo
