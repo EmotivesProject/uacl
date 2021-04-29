@@ -6,10 +6,13 @@ on:
     types: [ closed ]
 
 jobs:
-  merge_job:
+  build-and-push-image:
     # this job will only run if the PR has been merged
     if: github.event.pull_request.merged == true
     runs-on: self-hosted
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 1
+      - name: Run Makefile
+        run: ./scripts/build.sh
