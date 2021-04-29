@@ -20,3 +20,7 @@ https://stackoverflow.com/questions/23729790/how-can-i-do-test-setup-using-the-t
 docker login
 
 imthetom
+
+git fetch && git checkout origin/main
+git checkout work
+git merge origin/main
