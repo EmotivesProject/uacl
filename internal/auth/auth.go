@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	privateKeyLocation = "/app/jwt/private.key"
-	publicKeyLocation  = "/app/jwt/public.key"
+	privateKeyLocation = "/jwt/private.key"
+	publicKeyLocation  = "/jwt/public.key"
 	expirationTime     = 100000
 )
 
