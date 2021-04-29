@@ -2,7 +2,7 @@ version: '3'
 
 services:
   api:
-    image: imthetom/uacl_api
+    image: ghcr.io/tombowyerresearchproject/uacl_api:latest
     volumes:
       - /etc/localtime:/etc/localtime:ro
     environment:

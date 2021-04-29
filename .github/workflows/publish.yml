@@ -20,3 +20,15 @@ jobs:
         run: |
           echo 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 | docker login ghcr.io -u imthetom --password-stdin
           docker push ghcr.io/tombowyerresearchproject/uacl_api:latest
+      - name: Connect and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: 162.0.216.160
+          username: root
+          password: Github123
+          port: 22
+          script: |
+            echo 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 | docker login ghcr.io -u imthetom --password-stdin
+            git clone git@github.com:TomBowyerResearchProject/uacl.git
+            cd uacl
+            ./scripts/start.sh prod
