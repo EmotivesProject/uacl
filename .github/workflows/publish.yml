@@ -17,5 +17,6 @@ jobs:
       - name: Build image
         run: ./scripts/build.sh
       - name: Log in and push
-        run: echo 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 | docker login ghcr.io -u imthetom --password-stdin
-        run: docker push ghcr.io/tombowyerresearchproject/uacl_api:latest
+        run: |
+          echo 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 | docker login ghcr.io -u imthetom --password-stdin
+          docker push ghcr.io/tombowyerresearchproject/uacl_api:latest
