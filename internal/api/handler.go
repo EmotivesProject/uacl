@@ -15,7 +15,7 @@ import (
 	"github.com/TomBowyerResearchProject/common/response"
 )
 
-const publicKeyLocation = "/app/jwt/public.key"
+const publicKeyLocation = "/jwt/public.key"
 
 func healthz(w http.ResponseWriter, r *http.Request) {
 	response.MessageResponseJSON(w, http.StatusOK, response.Message{Message: messages.HealthResponse})
