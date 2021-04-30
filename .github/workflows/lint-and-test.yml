@@ -24,3 +24,5 @@ jobs:
         skip-go-installation: true
     - name: Test
       run: go test -v ./...
+    - name: Integration tests
+      run: make integration
