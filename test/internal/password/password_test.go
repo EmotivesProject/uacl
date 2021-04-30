@@ -40,6 +40,7 @@ func TestVerifyPassword(t *testing.T) {
 		} else {
 			result = password.ValidatePassword("Test12", generatedPassword)
 		}
+
 		assert.Equal(t, tc.want, result)
 	}
 }
