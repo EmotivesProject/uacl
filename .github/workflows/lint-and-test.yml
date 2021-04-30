@@ -25,4 +25,4 @@ jobs:
     - name: Test
       run: go test -v ./...
     - name: Integration tests
-      run: make integration
+      run: make integration SLEEP_TIME=10
