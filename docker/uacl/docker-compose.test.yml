@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  test_db:
+    image: postgres
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_PASSWORD: tom123
+      POSTGRES_USER: tom
+    volumes:
+      - ../../database/:/docker-entrypoint-initdb.d/
+    restart: unless-stopped
