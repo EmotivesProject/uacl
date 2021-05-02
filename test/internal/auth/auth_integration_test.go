@@ -20,7 +20,7 @@ func TestCanCreateToken(t *testing.T) {
 		Password: "test123",
 	}
 
-	_, err := auth.CreateToken(user)
+	_, err := auth.CreateToken(user, false)
 	assert.Nil(t, err)
 
 	test.TearDownIntegrationTest()

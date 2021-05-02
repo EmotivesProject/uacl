@@ -24,3 +24,5 @@ imthetom
 git fetch && git checkout origin/main
 git checkout work
 git merge origin/main
+
+go test -v -run TestRouterHealthzHandling ./test/internal/api/router_integration_test.go
