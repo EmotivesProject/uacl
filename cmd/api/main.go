@@ -9,8 +9,6 @@ import (
 	"github.com/TomBowyerResearchProject/common/logger"
 	"github.com/TomBowyerResearchProject/common/middlewares"
 	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -25,16 +23,9 @@ func main() {
 
 	router := api.CreateRouter()
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	host := os.Getenv("HOST")
-	port := os.Getenv("PORT")
-
 	commonPostgres.Connect(commonPostgres.Config{
-		URI: os.Getenv("databaseURL"),
+		URI: os.Getenv("DATABASE_URL"),
 	})
 
-	log.Fatal(http.ListenAndServe(host+":"+port, router))
+	log.Fatal(http.ListenAndServe(os.Getenv("HOST")+":"+os.Getenv("PORT"), router))
 }

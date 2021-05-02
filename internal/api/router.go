@@ -17,13 +17,11 @@ func CreateRouter() chi.Router {
 
 		r.Get("/authorize", authorizeHeader)
 
-		r.Route("/user", func(r chi.Router) {
-			r.Post("/", createUser)
-		})
+		r.Get("/refresh", refreshToken)
 
-		r.Route("/login", func(r chi.Router) {
-			r.Post("/", login)
-		})
+		r.Post("/user", createUser)
+
+		r.Post("/login", login)
 	})
 
 	return r
