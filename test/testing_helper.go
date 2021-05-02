@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -30,9 +31,12 @@ func CreateStringAtLength(length int) string {
 func SetUpIntegrationTest() {
 	logger.InitLogger("uacl")
 
-	commonPostgres.Connect(commonPostgres.Config{
+	err := commonPostgres.Connect(commonPostgres.Config{
 		URI: "postgres://tom:tom123@localhost:5435/uacl_db",
 	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	// These are set to be correct for internal/* tests
 	os.Setenv("PRIVATE_KEY", "./../../../jwt/private.key")
