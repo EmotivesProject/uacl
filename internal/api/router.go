@@ -17,7 +17,7 @@ func CreateRouter() chi.Router {
 
 		r.Get("/authorize", authorizeHeader)
 
-		r.Get("/refresh", refreshToken)
+		r.Post("/refresh", refreshToken)
 
 		r.Post("/user", createUser)
 

@@ -8,16 +8,24 @@ import (
 	"uacl/messages"
 	"uacl/model"
 
-	"github.com/TomBowyerResearchProject/common/logger"
 	"github.com/dgrijalva/jwt-go"
 )
 
-const expirationTime = 100000
+const (
+	expirationAccessTime  = 15    // 15 minutes
+	expirationRefreshTime = 43800 // 1 month
+)
 
-func CreateToken(user model.User) (string, error) {
-	expiresAt := time.Now().Add(time.Minute * expirationTime).Unix()
+func CreateToken(user model.User, refreshToken bool) (string, error) {
+	var expiresAt int64
 
-	now := time.Now().UTC()
+	currentTime := time.Now()
+
+	if refreshToken {
+		expiresAt = currentTime.Add(time.Minute * expirationRefreshTime).Unix()
+	} else {
+		expiresAt = currentTime.Add(time.Minute * expirationAccessTime).Unix()
+	}
 
 	short := model.ShortenedUser{
 		Name:     user.Name,
@@ -27,8 +35,8 @@ func CreateToken(user model.User) (string, error) {
 	claims := make(jwt.MapClaims)
 	claims["dat"] = short
 	claims["exp"] = expiresAt
-	claims["iat"] = now.Unix()
-	claims["nbf"] = now.Unix()
+	claims["iss"] = currentTime
+	claims["nbf"] = currentTime
 
 	private, err := ioutil.ReadFile(os.Getenv("PRIVATE_KEY"))
 	if err != nil {
@@ -40,14 +48,7 @@ func CreateToken(user model.User) (string, error) {
 		return "", err
 	}
 
-	tokenString, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
-	if err != nil {
-		return "", err
-	}
-
-	logger.Info("Successfully created token")
-
-	return tokenString, nil
+	return jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
 }
 
 func Validate(token string) (model.ShortenedUser, error) {
@@ -85,11 +86,6 @@ func Validate(token string) (model.ShortenedUser, error) {
 	}
 
 	err = json.Unmarshal(jsonString, &shorten)
-	if err != nil {
-		return shorten, err
-	}
 
-	logger.Info("Successfully validated token")
-
-	return shorten, nil
+	return shorten, err
 }
