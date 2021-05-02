@@ -4,6 +4,7 @@ import (
 	"context"
 	"uacl/model"
 
+	"github.com/TomBowyerResearchProject/common/logger"
 	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
 )
 
@@ -20,4 +21,24 @@ func FindByUsername(username string) (model.User, error) {
 	)
 
 	return user, err
+}
+
+func RefreshTokenIsValidForUsername(refreshToken, username string) bool {
+	db := commonPostgres.GetDatabase()
+
+	var exists bool
+
+	err := db.QueryRow(
+		context.TODO(),
+		"SELECT exists (SELECT * FROM tokens where username = $1 and refresh_token = $2)",
+		username,
+		refreshToken,
+	).Scan(&exists)
+	if err != nil {
+		logger.Error(err)
+
+		return false
+	}
+
+	return exists
 }

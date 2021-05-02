@@ -18,8 +18,8 @@ services:
       DATABASE_URL: postgres://tom:tom123@db:5432/uacl_db
       HOST: 0.0.0.0
       PORT: 80
-      PRIVATE_KEY: /jwt/private.key
-      PUBLIC_KEY: /jwt/public.key
+      PRIVATE_KEY: /app/jwt/private.key
+      PUBLIC_KEY: /app/jwt/public.key
       SECRET: qutCreate
     depends_on:
       - "db"

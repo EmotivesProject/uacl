@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 	"uacl/internal/auth"
 	"uacl/internal/db"
 	"uacl/internal/password"
@@ -53,7 +54,46 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 }
 
 func refreshToken(w http.ResponseWriter, r *http.Request) {
-	response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: "NO"})
+	token := model.Token{}
+
+	err := json.NewDecoder(r.Body).Decode(&token)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	user, err := auth.Validate(token.RefreshToken)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	if user.Username != token.Username {
+		logger.Error(messages.ErrMismatchUsername)
+		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{
+			Message: messages.ErrMismatchUsername.Error(),
+		})
+
+		return
+	}
+
+	if !db.RefreshTokenIsValidForUsername(token.RefreshToken, token.Username) {
+		logger.Error(messages.ErrWrongRefreshToken)
+		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{
+			Message: messages.ErrWrongRefreshToken.Error(),
+		})
+
+		return
+	}
+
+	passTokenToUser(w, &model.User{
+		Name:     user.Name,
+		Username: user.Username,
+	})
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -143,7 +183,15 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func passTokenToUser(w http.ResponseWriter, user *model.User) {
-	tokenString, err := auth.CreateToken(*user)
+	tokenString, err := auth.CreateToken(*user, false)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	refreshTokenString, err := auth.CreateToken(*user, true)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
@@ -152,7 +200,18 @@ func passTokenToUser(w http.ResponseWriter, user *model.User) {
 	}
 
 	token := model.Token{
-		Token: tokenString,
+		Username:     user.Username,
+		Token:        tokenString,
+		RefreshToken: refreshTokenString,
+		UpdatedAt:    time.Now(),
+	}
+
+	err = db.UpsertToken(&token)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+
+		return
 	}
 
 	response.ResultResponseJSON(w, http.StatusCreated, token)
