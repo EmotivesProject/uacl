@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"time"
 	"uacl/messages"
 	"uacl/model"
@@ -11,11 +12,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const (
-	privateKeyLocation = "./jwt/private.key"
-	publicKeyLocation  = "./jwt/public.key"
-	expirationTime     = 100000
-)
+const expirationTime = 100000
 
 func CreateToken(user model.User) (string, error) {
 	expiresAt := time.Now().Add(time.Minute * expirationTime).Unix()
@@ -33,7 +30,7 @@ func CreateToken(user model.User) (string, error) {
 	claims["iat"] = now.Unix()
 	claims["nbf"] = now.Unix()
 
-	private, err := ioutil.ReadFile(privateKeyLocation)
+	private, err := ioutil.ReadFile(os.Getenv("PRIVATE_KEY"))
 	if err != nil {
 		return "", err
 	}
@@ -56,7 +53,7 @@ func CreateToken(user model.User) (string, error) {
 func Validate(token string) (model.ShortenedUser, error) {
 	var shorten model.ShortenedUser
 
-	public, err := ioutil.ReadFile(publicKeyLocation)
+	public, err := ioutil.ReadFile(os.Getenv("PUBLIC_KEY"))
 	if err != nil {
 		return shorten, err
 	}

@@ -14,6 +14,13 @@ services:
       - "traefik.http.routers.uacl.entrypoints=web"
       - "traefik.docker.network=traefik"
     restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://tom:tom123@db:5432/uacl_db
+      HOST: 0.0.0.0
+      PORT: 80
+      PRIVATE_KEY: /jwt/private.key
+      PUBLIC_KEY: /jwt/public.key
+      SECRET: qutCreate
     depends_on:
       - "db"
     networks:

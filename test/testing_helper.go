@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"uacl/internal/api"
 
@@ -30,6 +31,10 @@ func SetUpIntegrationTest() {
 	commonPostgres.Connect(commonPostgres.Config{
 		URI: "postgres://tom:tom123@localhost:5435/uacl_db",
 	})
+
+	// These are set to be correct for internal/* tests
+	os.Setenv("PRIVATE_KEY", "./../../../jwt/private.key")
+	os.Setenv("PUBLIC_KEY", "./../../../jwt/public.key")
 
 	router := api.CreateRouter()
 

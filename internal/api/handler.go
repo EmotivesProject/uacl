@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"uacl/internal/auth"
 	"uacl/internal/db"
@@ -15,14 +16,12 @@ import (
 	"github.com/TomBowyerResearchProject/common/response"
 )
 
-const publicKeyLocation = "./jwt/public.key"
-
 func healthz(w http.ResponseWriter, r *http.Request) {
 	response.MessageResponseJSON(w, http.StatusOK, response.Message{Message: messages.HealthResponse})
 }
 
 func publicKey(w http.ResponseWriter, r *http.Request) {
-	public, err := ioutil.ReadFile(publicKeyLocation)
+	public, err := ioutil.ReadFile(os.Getenv("PUBLIC_KEY"))
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
@@ -35,7 +34,6 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Should also refresh if required.
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	header := r.Header.Get("Authorization")
 	header = strings.Split(header, "Bearer ")[1]
@@ -52,6 +50,10 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 
 	logger.Infof("Validating %s", user.Username)
 	response.ResultResponseJSON(w, http.StatusOK, user)
+}
+
+func refreshToken(w http.ResponseWriter, r *http.Request) {
+	response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: "NO"})
 }
 
 func login(w http.ResponseWriter, r *http.Request) {

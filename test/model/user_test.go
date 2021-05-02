@@ -1,6 +1,7 @@
 package model_test
 
 import (
+	"os"
 	"testing"
 	"uacl/model"
 	"uacl/test"
@@ -15,6 +16,8 @@ func setupTestCase() {
 	testUser.Username = "JaneTT"
 	testUser.Password = "Test123"
 	testUser.Secret = "qutCreate"
+
+	os.Setenv("SECRET", "qutCreate")
 }
 
 func TestNameValidLength(t *testing.T) {

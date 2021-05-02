@@ -1,6 +1,7 @@
 package model
 
 import (
+	"os"
 	"regexp"
 	"time"
 	"uacl/messages"
@@ -95,7 +96,7 @@ func isPasswordValid(e string) error {
 }
 
 func isSecretValid(e string) error {
-	if e != "qutCreate" {
+	if e != os.Getenv("SECRET") {
 		return messages.ErrInvalidSecret
 	}
 

@@ -30,6 +30,7 @@ jobs:
           script: |
             echo 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 | docker login ghcr.io -u imthetom --password-stdin
             docker pull ghcr.io/tombowyerresearchproject/uacl_api:latest
+            rm -R uacl
+            git clone git@github.com:TomBowyerResearchProject/uacl.git
             cd uacl
-            git fetch && git checkout origin/main
             ./scripts/start.sh prod
