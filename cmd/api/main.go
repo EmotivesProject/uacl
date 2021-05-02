@@ -23,9 +23,12 @@ func main() {
 
 	router := api.CreateRouter()
 
-	commonPostgres.Connect(commonPostgres.Config{
+	err := commonPostgres.Connect(commonPostgres.Config{
 		URI: os.Getenv("DATABASE_URL"),
 	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	log.Fatal(http.ListenAndServe(os.Getenv("HOST")+":"+os.Getenv("PORT"), router))
 }

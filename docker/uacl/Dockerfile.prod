@@ -21,7 +21,6 @@ FROM scratch
 
 COPY --from=builder /app/api /api
 COPY --from=builder /app/jwt/ /jwt
-COPY --from=builder /app/.env/ /.env
 
 EXPOSE 80
 
