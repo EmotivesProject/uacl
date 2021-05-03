@@ -1,7 +1,6 @@
 package test
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -51,7 +50,7 @@ func SetUpIntegrationTest() {
 
 func TearDownIntegrationTest() {
 	con := commonPostgres.GetDatabase()
-	con.Close(context.TODO())
+	con.Close()
 
 	TS.Close()
 }
