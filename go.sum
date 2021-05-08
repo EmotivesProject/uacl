@@ -7,6 +7,7 @@ github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030I
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
+github.com/TomBowyerResearchProject/common v1.0.1-0.20210508112947-de92a325834d h1:C6C3goAG3TFHsdUxhxbHj5RYM+p4cvVHrng2O0DekAQ=
 github.com/TomBowyerResearchProject/common/logger v0.0.0-20210415085024-5081280e07de h1:ctDA7RKbq9YNOJEsZhW95cBM61Gq0Q49REvrtQvnLSY=
 github.com/TomBowyerResearchProject/common/logger v0.0.0-20210415085024-5081280e07de/go.mod h1:HxQH9yD6ypU+/pHdDaPWsTezIqaqgvzBzeTuo+zwRLc=
 github.com/TomBowyerResearchProject/common/logger v0.0.0-20210424073919-9d12517c8ce1 h1:O/o3huGltYJSJR8RiqSIM80JkVbGpDIXY/F3heMn+sA=
@@ -21,6 +22,10 @@ github.com/TomBowyerResearchProject/common/postgres v0.0.0-20210503213359-73feb2
 github.com/TomBowyerResearchProject/common/postgres v0.0.0-20210503213359-73feb244bff7/go.mod h1:zovfD1vC7b/W5PtvkwPgxcQt25HkBEV1xmDUhPN3wlw=
 github.com/TomBowyerResearchProject/common/response v0.0.0-20210428074225-ab75e7bf399a h1:+a5WSu4UUPkQJ6klt9OV3cm6YNgnqqq5hhYWe4snBw4=
 github.com/TomBowyerResearchProject/common/response v0.0.0-20210428074225-ab75e7bf399a/go.mod h1:fib988ehDtUcBwwwNhHWjQSSruMEEMCLb5QZnfyWU84=
+github.com/TomBowyerResearchProject/common/response v0.0.0-20210508000653-21ba51f2b2ba h1:xfl+n+/jb+V7MmoK+agqKIkKsi3KWPFep7RbT/fOs10=
+github.com/TomBowyerResearchProject/common/response v0.0.0-20210508000653-21ba51f2b2ba/go.mod h1:fib988ehDtUcBwwwNhHWjQSSruMEEMCLb5QZnfyWU84=
+github.com/TomBowyerResearchProject/common/test v0.0.0-20210508112947-de92a325834d h1:S/f8rD+D5RSyAFx6vlsHBLoNn8BUcwa0Wr7CJN6o9BQ=
+github.com/TomBowyerResearchProject/common/test v0.0.0-20210508112947-de92a325834d/go.mod h1:Gd8oCpA/4+/d7KArlGpxXLAZD29xd/0ENhBAIVWx+kk=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
