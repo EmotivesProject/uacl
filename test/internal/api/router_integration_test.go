@@ -9,13 +9,14 @@ import (
 	"testing"
 	"uacl/test"
 
+	commonTest "github.com/TomBowyerResearchProject/common/test"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRouterHealthzHandling(t *testing.T) {
 	test.SetUpIntegrationTest()
 
-	r, _, _ := test.TestRequest(t, test.TS, "GET", "/healthz", nil)
+	r, _, _ := commonTest.TestRequest(t, test.TS, "GET", "/healthz", nil)
 
 	assert.EqualValues(t, r.StatusCode, http.StatusOK)
 
@@ -29,7 +30,7 @@ func TestRouterUserHandling(t *testing.T) {
 		"{\"username\": \"imtom124\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\" }",
 	)
 
-	r, _, _ := test.TestRequest(t, test.TS, "POST", "/user", requestBody)
+	r, _, _ := commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
 
 	assert.EqualValues(t, r.StatusCode, http.StatusCreated)
 
@@ -43,12 +44,12 @@ func TestRouterAuthHandling(t *testing.T) {
 		"{\"username\": \"imtom125\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\" }",
 	)
 
-	_, resp, _ := test.TestRequest(t, test.TS, "POST", "/user", requestBody)
+	_, resp, _ := commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
 
 	req, _ := http.NewRequest("GET", test.TS.URL+"/authorize", nil)
 	req.Header.Add("Authorization", "Bearer "+resp["token"].(string))
 
-	r, _, _ := test.CompleteTestRequest(t, req)
+	r, _, _ := commonTest.CompleteTestRequest(t, req)
 
 	assert.EqualValues(t, r.StatusCode, http.StatusOK)
 
@@ -61,14 +62,14 @@ func TestRouterRefreshHandling(t *testing.T) {
 	requestBody := strings.NewReader(
 		"{\"username\": \"imtom132\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\" }",
 	)
-	_, resp, _ := test.TestRequest(t, test.TS, "POST", "/user", requestBody)
+	_, resp, _ := commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
 
 	requestBody = strings.NewReader(
 		fmt.Sprintf("{\"username\": \"%s\", \"refresh_token\": \"%s\" }", resp["username"], resp["refresh_token"]),
 	)
 	req, _ := http.NewRequest("POST", test.TS.URL+"/refresh", requestBody)
 
-	r, _, _ := test.CompleteTestRequest(t, req)
+	r, _, _ := commonTest.CompleteTestRequest(t, req)
 
 	assert.EqualValues(t, r.StatusCode, http.StatusCreated)
 
@@ -81,14 +82,14 @@ func TestRouterLoginHandling(t *testing.T) {
 	requestBody := strings.NewReader(
 		"{\"username\": \"imtom134\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\" }",
 	)
-	test.TestRequest(t, test.TS, "POST", "/user", requestBody)
+	commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
 
 	requestBody = strings.NewReader(
 		fmt.Sprintf("{\"username\": \"%s\", \"password\": \"%s\" }", "imtom134", "test123"),
 	)
 	req, _ := http.NewRequest("POST", test.TS.URL+"/login", requestBody)
 
-	r, _, _ := test.CompleteTestRequest(t, req)
+	r, _, _ := commonTest.CompleteTestRequest(t, req)
 
 	assert.EqualValues(t, r.StatusCode, http.StatusCreated)
 
