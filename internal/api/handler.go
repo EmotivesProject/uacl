@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -77,7 +78,7 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !db.RefreshTokenIsValidForUsername(token.RefreshToken, token.Username) {
+	if !db.RefreshTokenIsValidForUsername(r.Context(), token.RefreshToken, token.Username) {
 		logger.Error(messages.ErrWrongRefreshToken)
 		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{
 			Message: messages.ErrWrongRefreshToken.Error(),
@@ -86,7 +87,7 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	passTokenToUser(w, &model.User{
+	passTokenToUser(r.Context(), w, &model.User{
 		Name:     user.Name,
 		Username: user.Username,
 	})
@@ -112,7 +113,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	databaseUser, err := db.FindByUsername(user.Username)
+	databaseUser, err := db.FindByUsername(r.Context(), user.Username)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
@@ -132,7 +133,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	logger.Infof("Logging in user %s", user.Username)
 
-	passTokenToUser(w, &databaseUser)
+	passTokenToUser(r.Context(), w, &databaseUser)
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
@@ -165,7 +166,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = encryptedPassword
 
-	err = db.CreateNewUser(user)
+	err = db.CreateNewUser(r.Context(), user)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
@@ -175,10 +176,10 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	logger.Infof("Created user %s", user.Username)
 
-	passTokenToUser(w, user)
+	passTokenToUser(r.Context(), w, user)
 }
 
-func passTokenToUser(w http.ResponseWriter, user *model.User) {
+func passTokenToUser(ctx context.Context, w http.ResponseWriter, user *model.User) {
 	tokenString, err := auth.CreateToken(*user, false)
 	if err != nil {
 		logger.Error(err)
@@ -202,7 +203,7 @@ func passTokenToUser(w http.ResponseWriter, user *model.User) {
 		UpdatedAt:    time.Now(),
 	}
 
-	err = db.UpsertToken(&token)
+	err = db.UpsertToken(ctx, &token)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})

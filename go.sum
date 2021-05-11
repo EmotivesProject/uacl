@@ -7,7 +7,6 @@ github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030I
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/TomBowyerResearchProject/common v1.0.1-0.20210508112947-de92a325834d h1:C6C3goAG3TFHsdUxhxbHj5RYM+p4cvVHrng2O0DekAQ=
 github.com/TomBowyerResearchProject/common/logger v0.0.0-20210415085024-5081280e07de h1:ctDA7RKbq9YNOJEsZhW95cBM61Gq0Q49REvrtQvnLSY=
 github.com/TomBowyerResearchProject/common/logger v0.0.0-20210415085024-5081280e07de/go.mod h1:HxQH9yD6ypU+/pHdDaPWsTezIqaqgvzBzeTuo+zwRLc=
 github.com/TomBowyerResearchProject/common/logger v0.0.0-20210424073919-9d12517c8ce1 h1:O/o3huGltYJSJR8RiqSIM80JkVbGpDIXY/F3heMn+sA=
@@ -16,12 +15,8 @@ github.com/TomBowyerResearchProject/common/logger v0.0.0-20210502204851-4aaa9f3a
 github.com/TomBowyerResearchProject/common/logger v0.0.0-20210502204851-4aaa9f3a3338/go.mod h1:HxQH9yD6ypU+/pHdDaPWsTezIqaqgvzBzeTuo+zwRLc=
 github.com/TomBowyerResearchProject/common/middlewares v0.0.0-20210428074225-ab75e7bf399a h1:83ivB9DME7zmblfhvxEGOkIUjmt5ectOKuFbJBfUZAQ=
 github.com/TomBowyerResearchProject/common/middlewares v0.0.0-20210428074225-ab75e7bf399a/go.mod h1:p/Ed6RvbJ4tMjVLY3wUahMeeC441aKl1CB23FTnPAWo=
-github.com/TomBowyerResearchProject/common/postgres v0.0.0-20210428074225-ab75e7bf399a h1:CSNn76EZUVQdEHlXTqiVPZ9YYV/Xl8JeIGUqJptF8VI=
-github.com/TomBowyerResearchProject/common/postgres v0.0.0-20210428074225-ab75e7bf399a/go.mod h1:zovfD1vC7b/W5PtvkwPgxcQt25HkBEV1xmDUhPN3wlw=
 github.com/TomBowyerResearchProject/common/postgres v0.0.0-20210503213359-73feb244bff7 h1:O7UUgiJBQhs3XF/n8s70Mpq8ODKlHTwMf57220cgx9A=
 github.com/TomBowyerResearchProject/common/postgres v0.0.0-20210503213359-73feb244bff7/go.mod h1:zovfD1vC7b/W5PtvkwPgxcQt25HkBEV1xmDUhPN3wlw=
-github.com/TomBowyerResearchProject/common/response v0.0.0-20210428074225-ab75e7bf399a h1:+a5WSu4UUPkQJ6klt9OV3cm6YNgnqqq5hhYWe4snBw4=
-github.com/TomBowyerResearchProject/common/response v0.0.0-20210428074225-ab75e7bf399a/go.mod h1:fib988ehDtUcBwwwNhHWjQSSruMEEMCLb5QZnfyWU84=
 github.com/TomBowyerResearchProject/common/response v0.0.0-20210508000653-21ba51f2b2ba h1:xfl+n+/jb+V7MmoK+agqKIkKsi3KWPFep7RbT/fOs10=
 github.com/TomBowyerResearchProject/common/response v0.0.0-20210508000653-21ba51f2b2ba/go.mod h1:fib988ehDtUcBwwwNhHWjQSSruMEEMCLb5QZnfyWU84=
 github.com/TomBowyerResearchProject/common/test v0.0.0-20210508112947-de92a325834d h1:S/f8rD+D5RSyAFx6vlsHBLoNn8BUcwa0Wr7CJN6o9BQ=

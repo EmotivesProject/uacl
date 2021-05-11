@@ -9,13 +9,13 @@ import (
 	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
 )
 
-func CreateNewUser(user *model.User) error {
+func CreateNewUser(ctx context.Context, user *model.User) error {
 	logger.Info("Creating new user")
 
 	db := commonPostgres.GetDatabase()
 
 	_, err := db.Exec(
-		context.Background(),
+		ctx,
 		"INSERT INTO users(name,username,password,created_at,updated_at) VALUES ($1,$2,$3,$4,$5)",
 		user.Name,
 		user.Username,
