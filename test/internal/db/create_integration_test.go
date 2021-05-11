@@ -3,6 +3,7 @@
 package db_test
 
 import (
+	"context"
 	"testing"
 	"uacl/internal/db"
 	"uacl/model"
@@ -19,7 +20,7 @@ func TestCanCreateUser(t *testing.T) {
 		Username: "test_acc",
 		Password: "test123",
 	}
-	err := db.CreateNewUser(&user)
+	err := db.CreateNewUser(context.Background(), &user)
 	assert.Nil(t, err)
 
 	test.TearDownIntegrationTest()
@@ -33,9 +34,9 @@ func TestCanNotCreateSameUser(t *testing.T) {
 		Username: "test_acc_2",
 		Password: "test123",
 	}
-	err := db.CreateNewUser(&user)
+	err := db.CreateNewUser(context.Background(), &user)
 	assert.Nil(t, err)
-	err = db.CreateNewUser(&user)
+	err = db.CreateNewUser(context.Background(), &user)
 	assert.NotNil(t, err)
 
 	test.TearDownIntegrationTest()

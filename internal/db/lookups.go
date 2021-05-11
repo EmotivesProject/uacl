@@ -8,12 +8,12 @@ import (
 	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
 )
 
-func FindByUsername(username string) (model.User, error) {
+func FindByUsername(ctx context.Context, username string) (model.User, error) {
 	user := model.User{}
 	db := commonPostgres.GetDatabase()
 
 	err := db.QueryRow(
-		context.Background(),
+		ctx,
 		"SELECT id,name,username,password,created_at,updated_at FROM users WHERE username = $1",
 		username,
 	).Scan(
@@ -23,13 +23,13 @@ func FindByUsername(username string) (model.User, error) {
 	return user, err
 }
 
-func RefreshTokenIsValidForUsername(refreshToken, username string) bool {
+func RefreshTokenIsValidForUsername(ctx context.Context, refreshToken, username string) bool {
 	db := commonPostgres.GetDatabase()
 
 	var exists bool
 
 	err := db.QueryRow(
-		context.TODO(),
+		ctx,
 		"SELECT exists (SELECT * FROM tokens where username = $1 and refresh_token = $2)",
 		username,
 		refreshToken,
