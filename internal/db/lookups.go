@@ -2,10 +2,13 @@ package db
 
 import (
 	"context"
+	"errors"
+	"uacl/messages"
 	"uacl/model"
 
 	"github.com/TomBowyerResearchProject/common/logger"
 	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
+	"github.com/jackc/pgx/v4"
 )
 
 func FindByUsername(ctx context.Context, username string) (model.User, error) {
@@ -19,6 +22,9 @@ func FindByUsername(ctx context.Context, username string) (model.User, error) {
 	).Scan(
 		&user.ID, &user.Name, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt,
 	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return user, messages.ErrInvalidCredentials
+	}
 
 	return user, err
 }

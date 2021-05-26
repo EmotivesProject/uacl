@@ -7,7 +7,7 @@ const (
 )
 
 var (
-	ErrInvalidCredentials          = errors.New("Invalid login credentials. Please try again")
+	ErrInvalidCredentials          = errors.New("Invalid username or password. Please try again")
 	ErrInvalidCharacter            = errors.New("Must only contain letters, numbers, spaces or underscores")
 	ErrInvalidUsernameOrNameLength = errors.New("Must be between 3 and 100 characters")
 	ErrInvalidSecret               = errors.New("Incorrect secret value")
