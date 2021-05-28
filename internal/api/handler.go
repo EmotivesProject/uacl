@@ -123,7 +123,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	correctPassword := password.ValidatePassword(user.Password, databaseUser.Password)
 	if !correctPassword {
-		logger.Error(err)
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{
 			Message: messages.ErrInvalidCredentials.Error(),
 		})

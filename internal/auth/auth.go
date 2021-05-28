@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	expirationAccessTime  = 15    // 15 minutes
+	expirationAccessTime  = 60    // 15 minutes
 	expirationRefreshTime = 43800 // 1 month
 )
 
