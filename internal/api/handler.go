@@ -168,6 +168,15 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	err = db.CreateNewUser(r.Context(), user)
 	if err != nil {
 		logger.Error(err)
+
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			response.MessageResponseJSON(
+				w, http.StatusUnprocessableEntity, response.Message{Message: "Username is already used"},
+			)
+
+			return
+		}
+
 		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
 
 		return
