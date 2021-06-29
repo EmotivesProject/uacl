@@ -64,7 +64,7 @@ func main() {
 
 	logger.Infof("Listening for http on: %s", os.Getenv("HOST")+":"+os.Getenv("PORT"))
 
-	if err := srv.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
+	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		commonPostgres.CloseDatabase()
 		log.Fatalf("HTTP server ListenAndServe: %v", err)
 	}
