@@ -27,14 +27,14 @@ func main() {
 		AllowedHeaders: "*",
 	})
 
-	router := api.CreateRouter()
-
 	err := commonPostgres.Connect(commonPostgres.Config{
 		URI: os.Getenv("DATABASE_URL"),
 	})
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	router := api.CreateRouter()
 
 	srv := http.Server{
 		Handler:      router,
@@ -46,26 +46,34 @@ func main() {
 	idleConnsClosed := make(chan struct{})
 
 	go func() {
-		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-		<-sig
+		sigint := make(chan os.Signal, 1)
 
-		logger.Info("Graceful shutdown initiated")
+		// interrupt signal sent from terminal
+		signal.Notify(sigint, os.Interrupt)
+		// sigterm signal sent from kubernetes
+		signal.Notify(sigint, syscall.SIGTERM)
 
+		<-sigint
+
+		// We received an interrupt signal, shut down.
 		if err := srv.Shutdown(context.Background()); err != nil {
-			logger.Infof("HTTP server shutdown: %v", err)
+			// Error from closing listeners, or context timeout:
+			logger.Infof("HTTP server Shutdown: %v", err)
 		}
 
 		commonPostgres.CloseDatabase()
-		logger.Info("Shutdown the server and disconnected postgres")
+
+		logger.Infof("Postgres disconnected")
 
 		close(idleConnsClosed)
 	}()
 
-	logger.Infof("Listening for http on: %s", os.Getenv("HOST")+":"+os.Getenv("PORT"))
+	logger.Info("Starting Server")
 
 	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-		commonPostgres.CloseDatabase()
-		log.Fatalf("HTTP server ListenAndServe: %v", err)
+		// Error starting or closing listener:
+		logger.Infof("HTTP server ListenAndServe: %v", err)
 	}
+
+	<-idleConnsClosed
 }
