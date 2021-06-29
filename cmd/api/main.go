@@ -48,12 +48,11 @@ func main() {
 	go func() {
 		sigint := make(chan os.Signal, 1)
 
-		// interrupt signal sent from terminal
-		signal.Notify(sigint, os.Interrupt)
-		// sigterm signal sent from kubernetes
-		signal.Notify(sigint, syscall.SIGTERM)
+		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
 
 		<-sigint
+
+		logger.Infof("Shutting down server")
 
 		// We received an interrupt signal, shut down.
 		if err := srv.Shutdown(context.Background()); err != nil {
