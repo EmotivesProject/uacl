@@ -39,7 +39,7 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.Validate(header)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{
+		response.MessageResponseJSON(w, http.StatusUnauthorized, response.Message{
 			Message: messages.ErrUnauthorised.Error(),
 		})
 
@@ -64,7 +64,7 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.Validate(token.RefreshToken)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, http.StatusUnauthorized, response.Message{Message: err.Error()})
 
 		return
 	}
