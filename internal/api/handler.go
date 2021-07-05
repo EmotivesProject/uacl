@@ -22,12 +22,12 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 	public, err := ioutil.ReadFile(os.Getenv("PUBLIC_KEY"))
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
 
 		return
 	}
 
-	response.ResultResponseJSON(w, http.StatusOK, model.Key{
+	response.ResultResponseJSON(w, false, http.StatusOK, model.Key{
 		Key: string(public),
 	})
 }
@@ -39,7 +39,7 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.Validate(header)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
 			Message: messages.ErrUnauthorised.Error(),
 		})
 
@@ -47,7 +47,7 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Infof("Validating %s", user.Username)
-	response.ResultResponseJSON(w, http.StatusOK, user)
+	response.ResultResponseJSON(w, false, http.StatusOK, user)
 }
 
 func refreshToken(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&token)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
 
 		return
 	}
@@ -64,14 +64,14 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.Validate(token.RefreshToken)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
 
 		return
 	}
 
 	if user.Username != token.Username {
 		logger.Error(messages.ErrMismatchUsername)
-		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
 			Message: messages.ErrMismatchUsername.Error(),
 		})
 
@@ -80,7 +80,7 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 
 	if !db.RefreshTokenIsValidForUsername(r.Context(), token.RefreshToken, token.Username) {
 		logger.Error(messages.ErrWrongRefreshToken)
-		response.MessageResponseJSON(w, http.StatusInternalServerError, response.Message{
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
 			Message: messages.ErrWrongRefreshToken.Error(),
 		})
 
@@ -97,7 +97,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
 
 		return
 	}
@@ -105,7 +105,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	target, err := user.ValidateLogin()
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
 			Message: err.Error(),
 			Target:  target,
 		})
@@ -116,14 +116,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 	databaseUser, err := db.FindByUsername(r.Context(), user.Username)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
 
 		return
 	}
 
 	correctPassword := password.ValidatePassword(user.Password, databaseUser.Password)
 	if !correctPassword {
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
 			Message: messages.ErrInvalidCredentials.Error(),
 		})
 
@@ -139,7 +139,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusBadRequest, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
 
 		return
 	}
@@ -147,7 +147,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	target, err := user.ValidateCreate()
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{
 			Message: err.Error(),
 			Target:  target,
 		})
@@ -158,7 +158,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	encryptedPassword := password.CreatePassword(user.Password)
 	if encryptedPassword == "" {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
 
 		return
 	}
@@ -171,13 +171,13 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			response.MessageResponseJSON(
-				w, http.StatusUnprocessableEntity, response.Message{Message: "Username is already used"},
+				w, false, http.StatusUnprocessableEntity, response.Message{Message: "Username is already used"},
 			)
 
 			return
 		}
 
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
 
 		return
 	}
@@ -191,7 +191,7 @@ func passTokenToUser(ctx context.Context, w http.ResponseWriter, user *model.Use
 	tokenString, err := auth.CreateToken(*user, false)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
 
 		return
 	}
@@ -199,7 +199,7 @@ func passTokenToUser(ctx context.Context, w http.ResponseWriter, user *model.Use
 	refreshTokenString, err := auth.CreateToken(*user, true)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
 
 		return
 	}
@@ -214,10 +214,10 @@ func passTokenToUser(ctx context.Context, w http.ResponseWriter, user *model.Use
 	err = db.UpsertToken(ctx, &token)
 	if err != nil {
 		logger.Error(err)
-		response.MessageResponseJSON(w, http.StatusUnprocessableEntity, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
 
 		return
 	}
 
-	response.ResultResponseJSON(w, http.StatusCreated, token)
+	response.ResultResponseJSON(w, false, http.StatusCreated, token)
 }
