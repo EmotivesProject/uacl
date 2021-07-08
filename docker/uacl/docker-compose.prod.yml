@@ -12,6 +12,8 @@ services:
       - "traefik.http.routers.uacl.tls.certresolver=letsencrypt"
       - "traefik.docker.network=traefik"
     restart: unless-stopped
+    logging:
+      driver: syslog
     environment:
       DATABASE_URL: postgres://tom:tom123@postgres_db:5432/uacl_db
       HOST: 0.0.0.0
