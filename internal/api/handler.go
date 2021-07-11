@@ -69,16 +69,7 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Username != token.Username {
-		logger.Error(messages.ErrMismatchUsername)
-		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
-			Message: messages.ErrMismatchUsername.Error(),
-		})
-
-		return
-	}
-
-	if !db.RefreshTokenIsValidForUsername(r.Context(), token.RefreshToken, token.Username) {
+	if !db.RefreshTokenIsValidForUsername(r.Context(), token.RefreshToken, user.Username) {
 		logger.Error(messages.ErrWrongRefreshToken)
 		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
 			Message: messages.ErrWrongRefreshToken.Error(),
