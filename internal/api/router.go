@@ -25,6 +25,11 @@ func CreateRouter() http.Handler {
 		r.Post("/user", createUser)
 
 		r.Post("/login", login)
+
+		r.Route("/autologin", func(r chi.Router) {
+			r.Post("/", createLoginToken)
+			r.Post("/{token}", authoriseLoginToken)
+		})
 	})
 
 	return r

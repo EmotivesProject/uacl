@@ -48,3 +48,17 @@ func RefreshTokenIsValidForUsername(ctx context.Context, refreshToken, username 
 
 	return exists
 }
+
+func FindAutologinForUser(ctx context.Context, autologinToken string) (model.AutologinRequest, error) {
+	db := commonPostgres.GetDatabase()
+
+	var user model.AutologinRequest
+
+	err := db.QueryRow(
+		ctx,
+		"SELECT username FROM autologin_tokens where autologin_token = $1",
+		autologinToken,
+	).Scan(&user.Username)
+
+	return user, err
+}
