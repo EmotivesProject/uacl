@@ -21,6 +21,7 @@ services:
       PRIVATE_KEY: /app/jwt/private.key
       PUBLIC_KEY: /app/jwt/public.key
       SECRET: qutCreate
+      AUTOLOGIN_URL: http://localhost/login?token=
     networks:
       traefik:
       default:

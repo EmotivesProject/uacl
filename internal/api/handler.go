@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -16,7 +17,12 @@ import (
 
 	"github.com/TomBowyerResearchProject/common/logger"
 	"github.com/TomBowyerResearchProject/common/response"
+	"github.com/go-chi/chi"
 )
+
+const autologinLength = 64
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func publicKey(w http.ResponseWriter, r *http.Request) {
 	public, err := ioutil.ReadFile(os.Getenv("PUBLIC_KEY"))
@@ -33,10 +39,7 @@ func publicKey(w http.ResponseWriter, r *http.Request) {
 }
 
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
-	header := r.Header.Get("Authorization")
-	header = strings.Split(header, "Bearer ")[1]
-
-	user, err := auth.Validate(header)
+	user, err := doAuthentication(r)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{
@@ -48,6 +51,13 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 
 	logger.Infof("Validating %s", user.Username)
 	response.ResultResponseJSON(w, false, http.StatusOK, user)
+}
+
+func doAuthentication(r *http.Request) (model.ShortenedUser, error) {
+	header := r.Header.Get("Authorization")
+	header = strings.Split(header, "Bearer ")[1]
+
+	return auth.Validate(header)
 }
 
 func refreshToken(w http.ResponseWriter, r *http.Request) {
@@ -178,6 +188,77 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	passTokenToUser(r.Context(), w, user)
 }
 
+func createLoginToken(w http.ResponseWriter, r *http.Request) {
+	_, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	user := &model.AutologinRequest{}
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	dbUser, err := db.FindByUsername(r.Context(), user.Username)
+	if err != nil {
+		logger.Error(err)
+		// assuming error with db is missing value
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	rand.Seed(time.Now().UnixNano())
+
+	id := RandStringRunes(autologinLength)
+
+	err = db.CreateNewAutologinToken(r.Context(), dbUser.Username, id)
+	if err != nil {
+		logger.Error(err)
+		// assuming error with db is missing value
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	auto := model.AutologinToken{
+		Username:       dbUser.Username,
+		AutologinToken: id,
+		Site:           os.Getenv("AUTOLOGIN_URL"),
+	}
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, auto)
+}
+
+func authoriseLoginToken(w http.ResponseWriter, r *http.Request) {
+	autologinToken := chi.URLParam(r, "token")
+
+	autoLoginRequest, err := db.FindAutologinForUser(r.Context(), autologinToken)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	dbUser, err := db.FindByUsername(r.Context(), autoLoginRequest.Username)
+	if err != nil {
+		logger.Error(err)
+		// assuming error with db is missing value
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	passTokenToUser(r.Context(), w, &dbUser)
+}
+
 func passTokenToUser(ctx context.Context, w http.ResponseWriter, user *model.User) {
 	tokenString, err := auth.CreateToken(*user, false)
 	if err != nil {
@@ -211,4 +292,14 @@ func passTokenToUser(ctx context.Context, w http.ResponseWriter, user *model.Use
 	}
 
 	response.ResultResponseJSON(w, false, http.StatusCreated, token)
+}
+
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		//nolint
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+
+	return string(b)
 }
