@@ -22,6 +22,7 @@ services:
       PUBLIC_KEY: /jwt/public.key
       SECRET: qutCreate
       AUTOLOGIN_URL: https://www.emotives.net/login?token=
+      AUTOLOGIN_CREATE_USERS: imtom,
     networks:
       traefik:
       default:

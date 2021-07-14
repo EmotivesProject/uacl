@@ -189,10 +189,19 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func createLoginToken(w http.ResponseWriter, r *http.Request) {
-	_, err := doAuthentication(r)
+	authUser, err := doAuthentication(r)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
+
+	in := stringInSlice(authUser.Username, authorizedUsers)
+	if !in {
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
 
 		return
 	}
@@ -302,4 +311,14 @@ func RandStringRunes(n int) string {
 	}
 
 	return string(b)
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+
+	return false
 }
