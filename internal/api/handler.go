@@ -12,6 +12,7 @@ import (
 	"uacl/internal/auth"
 	"uacl/internal/db"
 	"uacl/internal/password"
+	"uacl/internal/send"
 	"uacl/messages"
 	"uacl/model"
 
@@ -184,6 +185,11 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Infof("Created user %s", user.Username)
+
+	err = send.ChatterUser(user)
+	if encryptedPassword == "" {
+		logger.Error(err)
+	}
 
 	passTokenToUser(r.Context(), w, user)
 }
