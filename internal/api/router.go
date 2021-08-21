@@ -16,8 +16,6 @@ func CreateRouter() http.Handler {
 	r.Route("/", func(r chi.Router) {
 		r.Get("/healthz", response.Healthz)
 
-		r.Get("/public_key", publicKey)
-
 		r.Get("/authorize", authorizeHeader)
 
 		r.Post("/refresh", refreshToken)

@@ -3,8 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -22,22 +20,6 @@ import (
 )
 
 const autologinLength = 64
-
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-func publicKey(w http.ResponseWriter, r *http.Request) {
-	public, err := ioutil.ReadFile(os.Getenv("PUBLIC_KEY"))
-	if err != nil {
-		logger.Error(err)
-		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
-
-		return
-	}
-
-	response.ResultResponseJSON(w, false, http.StatusOK, model.Key{
-		Key: string(public),
-	})
-}
 
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	user, err := doAuthentication(r)
@@ -229,9 +211,13 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rand.Seed(time.Now().UnixNano())
+	id, err := generateRandomString(autologinLength)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
 
-	id := RandStringRunes(autologinLength)
+		return
+	}
 
 	err = db.CreateNewAutologinToken(r.Context(), dbUser.Username, id)
 	if err != nil {
@@ -307,24 +293,4 @@ func passTokenToUser(ctx context.Context, w http.ResponseWriter, user *model.Use
 	}
 
 	response.ResultResponseJSON(w, false, http.StatusCreated, token)
-}
-
-func RandStringRunes(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		//nolint
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-
-	return string(b)
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-
-	return false
 }
