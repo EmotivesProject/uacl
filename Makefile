@@ -23,5 +23,4 @@ integration_dry:
 	go test -v -tags=integration ./...
 
 get_latest_db:
-	echo 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 | docker login ghcr.io -u imthetom --password-stdin
 	docker pull ghcr.io/tombowyerresearchproject/postgres_db:latest
