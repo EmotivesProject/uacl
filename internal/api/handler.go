@@ -176,6 +176,35 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	passTokenToUser(r.Context(), w, user)
 }
 
+func getAutologinTokens(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
+
+	in := stringInSlice(authUser.Username, authorizedUsers)
+	if !in {
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
+
+		return
+	}
+
+	autologins, err := db.FindAutologins(r.Context())
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
+}
+
 func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	authUser, err := doAuthentication(r)
 	if err != nil {
@@ -235,6 +264,38 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.ResultResponseJSON(w, false, http.StatusCreated, auto)
+}
+
+func deleteAutologinToken(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
+
+	in := stringInSlice(authUser.Username, authorizedUsers)
+	if !in {
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
+
+		return
+	}
+
+	autologinToken := chi.URLParam(r, "token")
+
+	err = db.DeleteAutologinToken(r.Context(), autologinToken)
+	if err != nil {
+		logger.Error(err)
+		// assuming error with db is missing value
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	response.ResultResponseJSON(w, false, http.StatusOK, response.Message{Message: "Autologin Deleted"})
 }
 
 func authoriseLoginToken(w http.ResponseWriter, r *http.Request) {

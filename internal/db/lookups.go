@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"os"
 	"uacl/messages"
 	"uacl/model"
 
@@ -61,4 +62,36 @@ func FindAutologinForUser(ctx context.Context, autologinToken string) (model.Aut
 	).Scan(&user.Username)
 
 	return user, err
+}
+
+func FindAutologins(ctx context.Context) ([]model.AutologinToken, error) {
+	db := commonPostgres.GetDatabase()
+
+	autologins := make([]model.AutologinToken, 0)
+
+	rows, err := db.Query(
+		ctx,
+		"SELECT username, autologin_token FROM autologin_tokens",
+	)
+	if err != nil {
+		return autologins, err
+	}
+
+	for rows.Next() {
+		var autologin model.AutologinToken
+
+		err := rows.Scan(
+			&autologin.Username,
+			&autologin.AutologinToken,
+		)
+		if err != nil {
+			continue
+		}
+
+		autologin.Site = os.Getenv("AUTOLOGIN_URL")
+
+		autologins = append(autologins, autologin)
+	}
+
+	return autologins, err
 }
