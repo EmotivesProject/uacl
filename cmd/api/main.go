@@ -23,7 +23,7 @@ func main() {
 
 	middlewares.Init(middlewares.Config{
 		AllowedOrigin:  "*",
-		AllowedMethods: "GET,POST,OPTIONS",
+		AllowedMethods: "GET,POST,OPTIONS,DELETE",
 		AllowedHeaders: "*",
 	})
 
