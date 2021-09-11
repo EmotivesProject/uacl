@@ -19,7 +19,11 @@ import (
 const timeBeforeTimeout = 15
 
 func main() {
-	logger.InitLogger("uacl")
+	logger.InitLogger("uacl", logger.EmailConfig{
+		From:     os.Getenv("EMAIL_FROM"),
+		Password: os.Getenv("EMAIL_PASSWORD"),
+		Level:    os.Getenv("EMAIL_LEVEL"),
+	})
 
 	middlewares.Init(middlewares.Config{
 		AllowedOrigin:  "*",
