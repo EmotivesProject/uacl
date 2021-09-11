@@ -22,7 +22,11 @@ func CreateStringAtLength(length int) string {
 }
 
 func SetUpIntegrationTest() {
-	logger.InitLogger("uacl")
+	logger.InitLogger("uacl", logger.EmailConfig{
+		From:     os.Getenv("EMAIL_FROM"),
+		Password: os.Getenv("EMAIL_PASSWORD"),
+		Level:    os.Getenv("EMAIL_LEVEL"),
+	})
 
 	err := commonPostgres.Connect(commonPostgres.Config{
 		URI: "postgres://tom:tom123@localhost:5435/uacl_db",
