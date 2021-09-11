@@ -8,7 +8,7 @@ import (
 	"uacl/messages"
 	"uacl/model"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/golang-jwt/jwt/v4"
 )
 
 const (
