@@ -35,8 +35,8 @@ func CreateToken(user model.User, refreshToken bool) (string, error) {
 	claims := make(jwt.MapClaims)
 	claims["dat"] = short
 	claims["exp"] = expiresAt
-	claims["iss"] = currentTime
-	claims["nbf"] = currentTime
+	claims["iss"] = currentTime.Unix()
+	claims["nbf"] = currentTime.Unix()
 
 	private, err := ioutil.ReadFile(os.Getenv("PRIVATE_KEY"))
 	if err != nil {
