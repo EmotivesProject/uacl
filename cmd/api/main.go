@@ -28,7 +28,7 @@ func main() {
 	middlewares.Init(middlewares.Config{
 		AllowedOrigin:  "*",
 		AllowedMethods: "GET,POST,OPTIONS,DELETE",
-		AllowedHeaders: "*",
+		AllowedHeaders: "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token",
 	})
 
 	err := commonPostgres.Connect(commonPostgres.Config{
