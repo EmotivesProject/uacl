@@ -26,6 +26,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}

@@ -26,7 +26,7 @@ services:
       AUTOLOGIN_URL: https://www.emotives.net/login?token=
       AUTOLOGIN_CREATE_USERS: imtom,
       EMAIL_FROM: emotives.acc@gmail.com
-      EMAIL_PASSWORD: qutSecret123
+      EMAIL_PASSWORD: "${GMAIL_PASSWORD:-}"
       EMAIL_LEVEL: PROD
     networks:
       traefik:
