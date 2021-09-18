@@ -33,10 +33,9 @@ jobs:
           key: ${{ secrets.KEY }}
           envs: GITHUB_TOKEN,GMAIL_PASSWORD
           script: |
-            echo $GMAIL_PASSWORD
             echo $GITHUB_TOKEN | docker login ghcr.io -u imthetom --password-stdin
             docker pull ghcr.io/tombowyerresearchproject/uacl_api:latest
             rm -R uacl
             git clone git@github.com:TomBowyerResearchProject/uacl.git
             cd uacl
-            ./scripts/start.sh prod
+            ./scripts/start.sh prod no $GMAIL_PASSWORD
