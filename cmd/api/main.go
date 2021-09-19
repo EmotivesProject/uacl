@@ -26,7 +26,7 @@ func main() {
 	})
 
 	middlewares.Init(middlewares.Config{
-		AllowedOrigin:  "*",
+		AllowedOrigins: os.Getenv("ALLOWED_ORIGINS"),
 		AllowedMethods: "GET,POST,OPTIONS,DELETE",
 		AllowedHeaders: "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, X-CSRF-Token",
 	})
