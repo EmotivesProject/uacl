@@ -7,6 +7,7 @@ import (
 	"uacl/internal/api"
 
 	"github.com/TomBowyerResearchProject/common/logger"
+	"github.com/TomBowyerResearchProject/common/middlewares"
 	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
 )
 
@@ -26,6 +27,12 @@ func SetUpIntegrationTest() {
 		From:     os.Getenv("EMAIL_FROM"),
 		Password: os.Getenv("EMAIL_PASSWORD"),
 		Level:    os.Getenv("EMAIL_LEVEL"),
+	})
+
+	middlewares.Init(middlewares.Config{
+		AllowedOrigins: "*",
+		AllowedMethods: "GET,POST,OPTIONS,DELETE",
+		AllowedHeaders: "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, X-CSRF-Token",
 	})
 
 	err := commonPostgres.Connect(commonPostgres.Config{
