@@ -28,6 +28,7 @@ services:
       EMAIL_FROM: emotives.acc@gmail.com
       EMAIL_PASSWORD: "${GMAIL_PASSWORD:-}"
       EMAIL_LEVEL: PROD
+      ALLOWED_ORIGINS: https://emotives.net,https://wwww.emotives.net
     networks:
       traefik:
       default:
