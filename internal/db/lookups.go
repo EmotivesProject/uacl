@@ -95,3 +95,67 @@ func FindAutologins(ctx context.Context) ([]model.AutologinToken, error) {
 
 	return autologins, err
 }
+
+func FindFollowing(ctx context.Context, username string) (model.Followers, error) {
+	db := commonPostgres.GetDatabase()
+
+	followers := make([]string, 0)
+
+	rows, err := db.Query(
+		ctx,
+		"SELECT follow_username FROM followers where username = $1",
+		username,
+	)
+	if err != nil {
+		return model.Followers{}, err
+	}
+
+	for rows.Next() {
+		var follow string
+
+		err := rows.Scan(
+			&follow,
+		)
+		if err != nil {
+			continue
+		}
+
+		followers = append(followers, follow)
+	}
+
+	return model.Followers{
+		Username: followers,
+	}, err
+}
+
+func FindPossibleFollows(ctx context.Context, username string) (model.Followers, error) {
+	db := commonPostgres.GetDatabase()
+
+	followers := make([]string, 0)
+
+	rows, err := db.Query(
+		ctx,
+		"SELECT username FROM users where username != $1",
+		username,
+	)
+	if err != nil {
+		return model.Followers{}, err
+	}
+
+	for rows.Next() {
+		var follow string
+
+		err := rows.Scan(
+			&follow,
+		)
+		if err != nil {
+			continue
+		}
+
+		followers = append(followers, follow)
+	}
+
+	return model.Followers{
+		Username: followers,
+	}, err
+}

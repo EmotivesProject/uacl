@@ -266,6 +266,94 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	response.ResultResponseJSON(w, false, http.StatusCreated, auto)
 }
 
+func createFollow(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	followUsername := chi.URLParam(r, "follow")
+
+	err = db.CreateNewFollow(r.Context(), authUser.Username, followUsername)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	followering, _ := db.FindFollowing(r.Context(), authUser.Username)
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, followering)
+}
+
+func getFollowing(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	followering, err := db.FindFollowing(r.Context(), authUser.Username)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, followering)
+}
+
+func possibleFollow(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	followering, err := db.FindPossibleFollows(r.Context(), authUser.Username)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, followering)
+}
+
+func deleteFollow(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	followUsername := chi.URLParam(r, "follow")
+
+	err = db.DeleteFollowByUserAndFollow(r.Context(), authUser.Username, followUsername)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	followering, _ := db.FindFollowing(r.Context(), authUser.Username)
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, followering)
+}
+
 func deleteAutologinToken(w http.ResponseWriter, r *http.Request) {
 	authUser, err := doAuthentication(r)
 	if err != nil {
