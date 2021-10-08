@@ -27,21 +27,6 @@ func CreateNewUser(ctx context.Context, user *model.User) error {
 	return err
 }
 
-func CreateNewFollow(ctx context.Context, user, follow string) error {
-	logger.Info("Creating new user")
-
-	db := commonPostgres.GetDatabase()
-
-	_, err := db.Exec(
-		ctx,
-		"INSERT INTO followers(username,follow_username) VALUES ($1,$2)",
-		user,
-		follow,
-	)
-
-	return err
-}
-
 func CreateNewAutologinToken(ctx context.Context, username, uuid string) error {
 	logger.Info("Creating new autologin")
 

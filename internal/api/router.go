@@ -24,14 +24,6 @@ func CreateRouter() http.Handler {
 
 		r.Post("/login", login)
 
-		r.Get("/possible_follow", possibleFollow)
-
-		r.Route("/follow", func(r chi.Router) {
-			r.Get("/", getFollowing)
-			r.Post("/{follow}", createFollow)
-			r.Delete("/{follow}", deleteFollow)
-		})
-
 		r.Route("/autologin", func(r chi.Router) {
 			r.Post("/", createLoginToken)
 			r.Post("/{token}", authoriseLoginToken)
