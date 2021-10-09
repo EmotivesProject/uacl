@@ -16,9 +16,10 @@ func TestCanFindUserByUsername(t *testing.T) {
 	test.SetUpIntegrationTest()
 
 	user := model.User{
-		Name:     "test_acc",
-		Username: "test_acc_3",
-		Password: "test123",
+		Name:      "test_acc",
+		Username:  "test_acc_3",
+		Password:  "test123",
+		UserGroup: "qut",
 	}
 	err := db.CreateNewUser(context.Background(), &user)
 	assert.Nil(t, err)

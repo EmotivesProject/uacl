@@ -16,6 +16,7 @@ func setupTestCase() {
 	testUser.Username = "JaneTT"
 	testUser.Password = "Test123"
 	testUser.Secret = "qutCreate"
+	testUser.UserGroup = "qut"
 
 	os.Setenv("SECRET", "qutCreate")
 }
@@ -151,10 +152,21 @@ func TestInvalidCharacters(t *testing.T) {
 	}
 }
 
-func TestRouterInitializes(t *testing.T) {
+func TestInvalidSecret(t *testing.T) {
 	setupTestCase()
 
 	testUser.Secret = "incorrectSecret"
+
+	_, err := testUser.ValidateCreate()
+	result := err == nil
+
+	assert.False(t, result)
+}
+
+func TestInvalidGroup(t *testing.T) {
+	setupTestCase()
+
+	testUser.UserGroup = ""
 
 	_, err := testUser.ValidateCreate()
 	result := err == nil
