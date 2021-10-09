@@ -5,6 +5,8 @@ services:
     image: ghcr.io/tombowyerresearchproject/uacl_api:latest
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/jwt/private.key:/jwt/private.key
+      - /home/ubuntu/jwt/public.key:/jwt/public.key
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.uacl.rule=Host(`uacl.emotives.net`)"
