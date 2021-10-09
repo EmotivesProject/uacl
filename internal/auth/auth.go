@@ -28,8 +28,9 @@ func CreateToken(user model.User, refreshToken bool) (string, error) {
 	}
 
 	short := model.ShortenedUser{
-		Name:     user.Name,
-		Username: user.Username,
+		Name:      user.Name,
+		Username:  user.Username,
+		UserGroup: user.UserGroup,
 	}
 
 	claims := make(jwt.MapClaims)

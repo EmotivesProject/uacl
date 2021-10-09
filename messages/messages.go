@@ -20,4 +20,5 @@ var (
 	ErrParseKey                    = errors.New("Parse key")
 	ErrInvalid                     = errors.New("Invalid")
 	ErrUnauthorised                = errors.New("Unauthorised")
+	ErrInvalidGroup                = errors.New("Invalid Group")
 )

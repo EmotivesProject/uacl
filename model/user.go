@@ -11,6 +11,7 @@ const (
 	nameField     = "Name"
 	usernameField = "Username"
 	passwordField = "Password"
+	groupField    = "Group"
 	noField       = ""
 )
 
@@ -25,6 +26,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_time"`
 	UpdatedAt time.Time `json:"updated_time"`
 	Secret    string    `json:"secret"`
+	UserGroup string    `json:"user_group"`
 }
 
 func (u User) ValidateCreate() (string, error) {
@@ -42,6 +44,10 @@ func (u User) ValidateCreate() (string, error) {
 
 	if err := isSecretValid(u.Secret); err != nil {
 		return noField, err
+	}
+
+	if err := isGroupValid(u.UserGroup); err != nil {
+		return groupField, messages.ErrInvalidGroup
 	}
 
 	return noField, nil
@@ -98,6 +104,18 @@ func isPasswordValid(e string) error {
 func isSecretValid(e string) error {
 	if e != os.Getenv("SECRET") {
 		return messages.ErrInvalidSecret
+	}
+
+	return nil
+}
+
+func isGroupValid(e string) error {
+	if len(e) < 1 || len(e) > 100 {
+		return messages.ErrInvalidUsernameOrNameLength
+	}
+
+	if !generalCharacters.MatchString(e) {
+		return messages.ErrInvalidCharacter
 	}
 
 	return nil
