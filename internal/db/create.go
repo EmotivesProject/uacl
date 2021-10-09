@@ -16,12 +16,13 @@ func CreateNewUser(ctx context.Context, user *model.User) error {
 
 	_, err := db.Exec(
 		ctx,
-		"INSERT INTO users(name,username,password,created_at,updated_at) VALUES ($1,$2,$3,$4,$5)",
+		"INSERT INTO users(name,username,password,created_at,updated_at,user_group) VALUES ($1,$2,$3,$4,$5,$6)",
 		user.Name,
 		user.Username,
 		user.Password,
 		time.Now(),
 		time.Now(),
+		user.UserGroup,
 	)
 
 	return err

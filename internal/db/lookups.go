@@ -18,10 +18,10 @@ func FindByUsername(ctx context.Context, username string) (model.User, error) {
 
 	err := db.QueryRow(
 		ctx,
-		"SELECT id,name,username,password,created_at,updated_at FROM users WHERE username = $1",
+		"SELECT id,name,username,password,created_at,updated_at,user_group FROM users WHERE username = $1",
 		username,
 	).Scan(
-		&user.ID, &user.Name, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Name, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.UserGroup,
 	)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return user, messages.ErrInvalidCredentials

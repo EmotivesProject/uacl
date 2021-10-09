@@ -15,9 +15,10 @@ func TestCanCreateToken(t *testing.T) {
 	test.SetUpIntegrationTest()
 
 	user := model.User{
-		Name:     "test_acc",
-		Username: "test_acc",
-		Password: "test123",
+		Name:      "test_acc",
+		Username:  "test_acc",
+		Password:  "test123",
+		UserGroup: "qut",
 	}
 
 	_, err := auth.CreateToken(user, false)
