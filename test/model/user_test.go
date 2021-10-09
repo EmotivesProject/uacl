@@ -15,10 +15,10 @@ func setupTestCase() {
 	testUser.Name = "Jane"
 	testUser.Username = "JaneTT"
 	testUser.Password = "Test123"
-	testUser.Secret = "qutCreate"
+	testUser.Secret = "test"
 	testUser.UserGroup = "qut"
 
-	os.Setenv("SECRET", "qutCreate")
+	os.Setenv("SECRET", "test")
 }
 
 func TestNameValidLength(t *testing.T) {

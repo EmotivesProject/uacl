@@ -27,7 +27,7 @@ func TestRouterUserHandling(t *testing.T) {
 	test.SetUpIntegrationTest()
 
 	requestBody := strings.NewReader(
-		"{\"username\": \"imtom124\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\", \"user_group\": \"qut\" }",
+		"{\"username\": \"imtom124\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"test\", \"user_group\": \"qut\" }",
 	)
 
 	r, _, _ := commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
@@ -41,7 +41,7 @@ func TestRouterAuthHandling(t *testing.T) {
 	test.SetUpIntegrationTest()
 
 	requestBody := strings.NewReader(
-		"{\"username\": \"imtom125\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\", \"user_group\": \"qut\" }",
+		"{\"username\": \"imtom125\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"test\", \"user_group\": \"qut\" }",
 	)
 
 	_, resp, _ := commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
@@ -60,7 +60,7 @@ func TestRouterRefreshHandling(t *testing.T) {
 	test.SetUpIntegrationTest()
 
 	requestBody := strings.NewReader(
-		"{\"username\": \"imtom132\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\", \"user_group\": \"qut\" }",
+		"{\"username\": \"imtom132\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"test\", \"user_group\": \"qut\" }",
 	)
 	_, resp, _ := commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
 
@@ -80,7 +80,7 @@ func TestRouterLoginHandling(t *testing.T) {
 	test.SetUpIntegrationTest()
 
 	requestBody := strings.NewReader(
-		"{\"username\": \"imtom134\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"qutCreate\", \"user_group\": \"qut\" }",
+		"{\"username\": \"imtom134\", \"name\": \"imtom\", \"password\": \"test123\", \"secret\": \"test\", \"user_group\": \"qut\" }",
 	)
 	commonTest.TestRequest(t, test.TS, "POST", "/user", requestBody)
 

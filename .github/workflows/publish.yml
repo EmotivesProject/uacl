@@ -27,15 +27,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
           GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+          SECRET: ${{ secrets.SECRET }}
+          CHATTER_AUTH: ${{ secrets.CHATTER_AUTH }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          envs: GITHUB_TOKEN,GMAIL_PASSWORD
+          envs: GITHUB_TOKEN,GMAIL_PASSWORD,SECRET,CHATTER_AUTH
           script: |
             echo $GITHUB_TOKEN | docker login ghcr.io -u imthetom --password-stdin
             docker pull ghcr.io/tombowyerresearchproject/uacl_api:latest
             rm -R uacl
             git clone git@github.com:TomBowyerResearchProject/uacl.git
             cd uacl
-            ./scripts/start.sh prod no $GMAIL_PASSWORD
+            ./scripts/start.sh prod no $GMAIL_PASSWORD $SECRET $CHATTER_AUTH

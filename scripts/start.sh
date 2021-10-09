@@ -4,6 +4,8 @@
 stage="$1"
 build="$2"
 export GMAIL_PASSWORD="$3"
+export SECRET="$4"
+export CHATTER_AUTH="$5"
 
 if [ "$stage" == 'prod' ]; then
 	if [ "$build" == 'yes' ]; then
