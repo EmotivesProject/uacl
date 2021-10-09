@@ -20,9 +20,9 @@ services:
       PORT: 80
       PRIVATE_KEY: /jwt/private.key
       PUBLIC_KEY: /jwt/public.key
-      SECRET: test
+      SECRET: "${SECRET:?}"
       CHATTER_URL: http://chatter/user
-      CHATTER_AUTH: devSecret
+      CHATTER_AUTH: "${CHATTER_AUTH:?}"
       AUTOLOGIN_URL: https://www.emotives.net/login?token=
       AUTOLOGIN_CREATE_USERS: imtom,
       EMAIL_FROM: emotives.acc@gmail.com
