@@ -22,7 +22,7 @@ func ChatterUser(user *model.User) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", os.Getenv("CHATTER_SECRET"))
+	req.Header.Set("Authorization", os.Getenv("SECRET"))
 
 	client := &http.Client{}
 

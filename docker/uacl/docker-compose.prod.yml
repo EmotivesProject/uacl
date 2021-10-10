@@ -5,6 +5,8 @@ services:
     image: ghcr.io/tombowyerresearchproject/uacl_api:latest
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/jwt/private.key:/jwt/private.key
+      - /home/ubuntu/jwt/public.key:/jwt/public.key
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.uacl.rule=Host(`uacl.emotives.net`)"
@@ -20,9 +22,9 @@ services:
       PORT: 80
       PRIVATE_KEY: /jwt/private.key
       PUBLIC_KEY: /jwt/public.key
-      SECRET: qutCreate
+      SECRET: "${SECRET:?}"
       CHATTER_URL: http://chatter/user
-      CHATTER_SECRET: chatterSecret
+      CHATTER_AUTH: "${CHATTER_AUTH:?}"
       AUTOLOGIN_URL: https://www.emotives.net/login?token=
       AUTOLOGIN_CREATE_USERS: imtom,
       EMAIL_FROM: emotives.acc@gmail.com

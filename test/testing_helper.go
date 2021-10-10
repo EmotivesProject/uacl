@@ -46,7 +46,7 @@ func SetUpIntegrationTest() {
 	os.Setenv("PRIVATE_KEY", "./../../../jwt/private.key")
 	os.Setenv("PUBLIC_KEY", "./../../../jwt/public.key")
 
-	os.Setenv("SECRET", "qutCreate")
+	os.Setenv("SECRET", "test")
 
 	router := api.CreateRouter()
 

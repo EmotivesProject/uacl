@@ -15,15 +15,15 @@ services:
       - "traefik.docker.network=traefik"
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgres://tom:tom123@postgres_db:5432/uacl_db
+      DATABASE_URL: postgres://postgres@postgres_db:5432/uacl_db
       HOST: 0.0.0.0
       PORT: 80
       PRIVATE_KEY: /app/jwt/private.key
       PUBLIC_KEY: /app/jwt/public.key
-      SECRET: qutCreate
+      SECRET: test
       AUTOLOGIN_URL: http://localhost/login?token=
       CHATTER_URL: http://chatter/user
-      CHATTER_SECRET: chatterSecret
+      CHATTER_AUTH: devSecret
       AUTOLOGIN_CREATE_USERS: imtom,
       ALLOWED_ORIGINS: http://localhost
     networks:
