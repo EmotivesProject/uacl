@@ -169,7 +169,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	logger.Infof("Created user %s", user.Username)
 
 	err = send.ChatterUser(user)
-	if encryptedPassword == "" {
+	if err != nil {
 		logger.Error(err)
 	}
 
