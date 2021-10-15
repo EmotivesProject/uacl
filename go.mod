@@ -3,10 +3,10 @@ module uacl
 go 1.16
 
 require (
-	github.com/TomBowyerResearchProject/common/logger v0.0.0-20210911232627-ec84ebf2ae78
+	github.com/TomBowyerResearchProject/common/logger v0.0.0-20211015205042-48c34f5d56e6
 	github.com/TomBowyerResearchProject/common/middlewares v0.0.0-20210919005447-655b37d3d519
 	github.com/TomBowyerResearchProject/common/postgres v0.0.0-20210705095908-154760228061
-	github.com/TomBowyerResearchProject/common/response v0.0.0-20210918225212-3eb04f0c81a1
+	github.com/TomBowyerResearchProject/common/response v0.0.0-20211015205805-83e9007bc2ab
 	github.com/TomBowyerResearchProject/common/test v0.0.0-20210705095908-154760228061
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.0.0
