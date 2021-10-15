@@ -19,7 +19,10 @@ import (
 	"github.com/go-chi/chi"
 )
 
-const autologinLength = 64
+const (
+	autologinLength       = 64
+	successfulHeaderCount = 2
+)
 
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	user, err := doAuthentication(r)
@@ -40,7 +43,7 @@ func doAuthentication(r *http.Request) (model.ShortenedUser, error) {
 	header := r.Header.Get("Authorization")
 	headerSplit := strings.Split(header, "Bearer ")
 
-	if len(headerSplit) < 2 {
+	if len(headerSplit) < successfulHeaderCount {
 		return model.ShortenedUser{}, messages.ErrUnauthorised
 	}
 
