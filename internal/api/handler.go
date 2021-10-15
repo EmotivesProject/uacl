@@ -19,7 +19,10 @@ import (
 	"github.com/go-chi/chi"
 )
 
-const autologinLength = 64
+const (
+	autologinLength       = 64
+	successfulHeaderCount = 2
+)
 
 func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 	user, err := doAuthentication(r)
@@ -32,15 +35,19 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Infof("Validating %s", user.Username)
+	logger.Infof("Authorization request for %s", user.Username)
 	response.ResultResponseJSON(w, false, http.StatusOK, user)
 }
 
 func doAuthentication(r *http.Request) (model.ShortenedUser, error) {
 	header := r.Header.Get("Authorization")
-	header = strings.Split(header, "Bearer ")[1]
+	headerSplit := strings.Split(header, "Bearer ")
 
-	return auth.Validate(header)
+	if len(headerSplit) < successfulHeaderCount {
+		return model.ShortenedUser{}, messages.ErrUnauthorised
+	}
+
+	return auth.Validate(headerSplit[1])
 }
 
 func refreshToken(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +77,8 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	logger.Infof("Created refresh token for %s", user.Username)
 
 	passTokenToUser(r.Context(), w, &model.User{
 		Name:     user.Name,
@@ -202,6 +211,8 @@ func getAutologinTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Info("Fetched autologins")
+
 	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
 }
 
@@ -263,6 +274,8 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		Site:           os.Getenv("AUTOLOGIN_URL"),
 	}
 
+	logger.Infof("Created autologin for user %s %s", dbUser.Username, id)
+
 	response.ResultResponseJSON(w, false, http.StatusCreated, auto)
 }
 
@@ -295,6 +308,8 @@ func deleteAutologinToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Infof("Deleted autologin %s", autologinToken)
+
 	response.ResultResponseJSON(w, false, http.StatusOK, response.Message{Message: "Autologin Deleted"})
 }
 
@@ -317,6 +332,8 @@ func authoriseLoginToken(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	logger.Infof("Logging in user via autologin %s", dbUser.Username)
 
 	passTokenToUser(r.Context(), w, &dbUser)
 }
