@@ -95,6 +95,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user.Username = strings.ToLower(user.Username)
+	user.UserGroup = strings.ToLower(user.UserGroup)
+
 	target, err := user.ValidateLogin()
 	if err != nil {
 		logger.Error(err)
@@ -136,6 +139,9 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	user.Username = strings.ToLower(user.Username)
+	user.UserGroup = strings.ToLower(user.UserGroup)
 
 	target, err := user.ValidateCreate()
 	if err != nil {
@@ -242,10 +248,10 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user.Username = strings.ToLower(user.Username)
+
 	dbUser, err := db.FindByUsername(r.Context(), user.Username)
 	if err != nil {
-		logger.Error(err)
-		// assuming error with db is missing value
 		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
 
 		return
