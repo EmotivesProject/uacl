@@ -56,7 +56,7 @@ func main() {
 
 		<-sigint
 
-		logger.Infof("Shutting down server")
+		logger.Info("Shutting down server")
 
 		// We received an interrupt signal, shut down.
 		if err := srv.Shutdown(context.Background()); err != nil {
@@ -66,7 +66,7 @@ func main() {
 
 		commonPostgres.CloseDatabase()
 
-		logger.Infof("Postgres disconnected")
+		logger.Info("Postgres disconnected")
 
 		close(idleConnsClosed)
 	}()

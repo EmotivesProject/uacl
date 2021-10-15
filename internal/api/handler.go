@@ -39,6 +39,7 @@ func authorizeHeader(w http.ResponseWriter, r *http.Request) {
 func doAuthentication(r *http.Request) (model.ShortenedUser, error) {
 	header := r.Header.Get("Authorization")
 	headerSplit := strings.Split(header, "Bearer ")
+
 	if len(headerSplit) < 2 {
 		return model.ShortenedUser{}, messages.ErrUnauthorised
 	}
@@ -207,7 +208,7 @@ func getAutologinTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Infof("Fetched autologins")
+	logger.Info("Fetched autologins")
 
 	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
 }
@@ -329,7 +330,7 @@ func authoriseLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Infof("Logging in user via autologin", dbUser.Username)
+	logger.Infof("Logging in user via autologin %s", dbUser.Username)
 
 	passTokenToUser(r.Context(), w, &dbUser)
 }
