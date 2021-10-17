@@ -81,8 +81,9 @@ func refreshToken(w http.ResponseWriter, r *http.Request) {
 	logger.Infof("Created refresh token for %s", user.Username)
 
 	passTokenToUser(r.Context(), w, &model.User{
-		Name:     user.Name,
-		Username: user.Username,
+		Name:      user.Name,
+		Username:  user.Username,
+		UserGroup: user.UserGroup,
 	})
 }
 
