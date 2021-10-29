@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -f docker/uacl/Dockerfile.prod -t ghcr.io/tombowyerresearchproject/uacl_api .
+docker build -f docker/uacl/Dockerfile.prod -t ghcr.io/emotivesproject/uacl_api .

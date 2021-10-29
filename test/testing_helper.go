@@ -6,9 +6,9 @@ import (
 	"os"
 	"uacl/internal/api"
 
-	"github.com/TomBowyerResearchProject/common/logger"
-	"github.com/TomBowyerResearchProject/common/middlewares"
-	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
+	"github.com/EmotivesProject/common/logger"
+	"github.com/EmotivesProject/common/middlewares"
+	commonPostgres "github.com/EmotivesProject/common/postgres"
 )
 
 var TS *httptest.Server

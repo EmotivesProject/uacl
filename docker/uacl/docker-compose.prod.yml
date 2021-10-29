@@ -2,7 +2,7 @@ version: '3'
 
 services:
   api:
-    image: ghcr.io/tombowyerresearchproject/uacl_api:latest
+    image: ghcr.io/emotivesproject/uacl_api:latest
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/ubuntu/jwt/private.key:/jwt/private.key

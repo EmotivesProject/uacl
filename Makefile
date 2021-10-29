@@ -23,4 +23,4 @@ integration_dry:
 	go test -v -tags=integration ./...
 
 get_latest_db:
-	docker pull ghcr.io/tombowyerresearchproject/postgres_db:latest
+	docker pull ghcr.io/emotivesproject/postgres_db:latest

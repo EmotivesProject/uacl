@@ -3,7 +3,7 @@ package password
 import (
 	"errors"
 
-	"github.com/TomBowyerResearchProject/common/logger"
+	"github.com/EmotivesProject/common/logger"
 
 	"golang.org/x/crypto/bcrypt"
 )

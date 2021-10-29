@@ -42,5 +42,5 @@ DELETE - /autologin/{token} - deletes the token if it can be found the database.
 ```
 ## Database design
 Uses a postgres database.
-[See here for latest schema, uses the uacl_db](https://github.com/TomBowyerResearchProject/databases)
+[See here for latest schema, uses the uacl_db](https://github.com/EmotivesProject/databases)
 
