@@ -14,8 +14,8 @@ import (
 	"uacl/messages"
 	"uacl/model"
 
-	"github.com/TomBowyerResearchProject/common/logger"
-	"github.com/TomBowyerResearchProject/common/response"
+	"github.com/EmotivesProject/common/logger"
+	"github.com/EmotivesProject/common/response"
 	"github.com/go-chi/chi"
 )
 

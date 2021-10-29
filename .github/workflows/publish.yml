@@ -21,7 +21,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
         run: |
           echo $GITHUB_TOKEN | docker login ghcr.io -u imthetom --password-stdin
-          docker push ghcr.io/tombowyerresearchproject/uacl_api:latest
+          docker push ghcr.io/emotivesproject/uacl_api:latest
       - name: Connect and deploy
         uses: appleboy/ssh-action@master
         env:
@@ -34,8 +34,8 @@ jobs:
           key: ${{ secrets.KEY }}
           envs: GMAIL_PASSWORD,SECRET,CHATTER_AUTH
           script: |
-            docker pull ghcr.io/tombowyerresearchproject/uacl_api:latest
+            docker pull ghcr.io/emotivesproject/uacl_api:latest
             rm -R uacl
-            git clone git@github.com:TomBowyerResearchProject/uacl.git
+            git clone git@github.com:EmotivesProject/uacl.git
             cd uacl
             ./scripts/start.sh prod no $GMAIL_PASSWORD $SECRET $CHATTER_AUTH

@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/TomBowyerResearchProject/common/middlewares"
-	"github.com/TomBowyerResearchProject/common/response"
+	"github.com/EmotivesProject/common/middlewares"
+	"github.com/EmotivesProject/common/response"
 	"github.com/go-chi/chi"
 )
 

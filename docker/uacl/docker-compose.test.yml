@@ -2,7 +2,7 @@ version: '3'
 
 services:
   test_db:
-    image: ghcr.io/tombowyerresearchproject/postgres_db
+    image: ghcr.io/emotivesproject/postgres_db
     ports:
       - 5435:5432
     environment:

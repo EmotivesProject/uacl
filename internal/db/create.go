@@ -5,8 +5,8 @@ import (
 	"time"
 	"uacl/model"
 
-	"github.com/TomBowyerResearchProject/common/logger"
-	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
+	"github.com/EmotivesProject/common/logger"
+	commonPostgres "github.com/EmotivesProject/common/postgres"
 )
 
 func CreateNewUser(ctx context.Context, user *model.User) error {

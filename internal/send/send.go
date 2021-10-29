@@ -7,7 +7,7 @@ import (
 	"os"
 	"uacl/model"
 
-	"github.com/TomBowyerResearchProject/common/logger"
+	"github.com/EmotivesProject/common/logger"
 )
 
 func ChatterUser(user *model.User) error {

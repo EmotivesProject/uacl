@@ -4,7 +4,7 @@ import (
 	"context"
 	"uacl/model"
 
-	commonPostgres "github.com/TomBowyerResearchProject/common/postgres"
+	commonPostgres "github.com/EmotivesProject/common/postgres"
 )
 
 func UpsertToken(ctx context.Context, token *model.Token) error {
