@@ -273,15 +273,6 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
-
-	in := stringInSlice(authUser.Username, authorizedUsers)
-	if !in {
-		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
-
-		return
-	}
-
 	user := &model.AutologinRequest{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		logger.Error(err)
@@ -291,6 +282,17 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.Username = strings.ToLower(user.Username)
+
+	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
+
+	in := stringInSlice(authUser.Username, authorizedUsers)
+	isUsernameEqual := user.Username == authUser.Username
+
+	if !in && !isUsernameEqual {
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
+
+		return
+	}
 
 	dbUser, err := db.FindByUsername(r.Context(), user.Username)
 	if err != nil {
