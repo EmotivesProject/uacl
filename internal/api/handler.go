@@ -234,8 +234,7 @@ func getLatestAutologinTokens(w http.ResponseWriter, r *http.Request) {
 
 	autologins, err := db.FindAutologinByUsername(r.Context(), authUser.Username)
 	if err != nil {
-		logger.Error(err)
-		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+		response.MessageResponseJSON(w, false, http.StatusOK, response.Message{Message: err.Error()})
 
 		return
 	}
