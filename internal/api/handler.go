@@ -306,9 +306,8 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
 
 	in := stringInSlice(authUser.Username, authorizedUsers)
-	isUsernameEqual := user.Username == authUser.Username
 
-	if !in && !isUsernameEqual {
+	if !in && !(user.Username == authUser.Username) {
 		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
 
 		return
@@ -345,7 +344,7 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		Site:           os.Getenv("AUTOLOGIN_URL"),
 	}
 
-	logger.Infof("Created autologin for user %s %s", dbUser.Username, id)
+	logger.Infof("Created autologin for user %s %s", dbUser.Username, token)
 
 	response.ResultResponseJSON(w, false, http.StatusCreated, auto)
 }
