@@ -281,8 +281,6 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Username = strings.ToLower(user.Username)
-
 	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
 
 	in := stringInSlice(authUser.Username, authorizedUsers)
