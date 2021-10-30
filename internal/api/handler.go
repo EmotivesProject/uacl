@@ -223,6 +223,28 @@ func getAutologinTokens(w http.ResponseWriter, r *http.Request) {
 	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
 }
 
+func getLatestAutologinTokens(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	autologins, err := db.FindAutologinByUsername(r.Context(), authUser.Username)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	logger.Infof("Fetched autologins for user %s", authUser.Username)
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
+}
+
 func getAutologinToken(w http.ResponseWriter, r *http.Request) {
 	authUser, err := doAuthentication(r)
 	if err != nil {
@@ -273,15 +295,6 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
-
-	in := stringInSlice(authUser.Username, authorizedUsers)
-	if !in {
-		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
-
-		return
-	}
-
 	user := &model.AutologinRequest{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		logger.Error(err)
@@ -290,7 +303,15 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Username = strings.ToLower(user.Username)
+	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
+
+	in := stringInSlice(authUser.Username, authorizedUsers)
+
+	if !in && !(user.Username == authUser.Username) {
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
+
+		return
+	}
 
 	dbUser, err := db.FindByUsername(r.Context(), user.Username)
 	if err != nil {
@@ -299,7 +320,7 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := generateRandomString(autologinLength)
+	token, err := generateRandomString(autologinLength)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
@@ -307,7 +328,7 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.CreateNewAutologinToken(r.Context(), dbUser.Username, id)
+	id, err := db.CreateNewAutologinToken(r.Context(), dbUser.Username, token)
 	if err != nil {
 		logger.Error(err)
 		// assuming error with db is missing value
@@ -317,12 +338,13 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auto := model.AutologinToken{
+		ID:             id,
 		Username:       dbUser.Username,
-		AutologinToken: id,
+		AutologinToken: token,
 		Site:           os.Getenv("AUTOLOGIN_URL"),
 	}
 
-	logger.Infof("Created autologin for user %s %s", dbUser.Username, id)
+	logger.Infof("Created autologin for user %s %s", dbUser.Username, token)
 
 	response.ResultResponseJSON(w, false, http.StatusCreated, auto)
 }
