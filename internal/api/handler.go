@@ -223,6 +223,28 @@ func getAutologinTokens(w http.ResponseWriter, r *http.Request) {
 	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
 }
 
+func getLatestAutologinTokens(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	autologins, err := db.FindAutologinByUsername(r.Context(), authUser.Username)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	logger.Infof("Fetched autologins for user %s", authUser.Username)
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
+}
+
 func getAutologinToken(w http.ResponseWriter, r *http.Request) {
 	authUser, err := doAuthentication(r)
 	if err != nil {
@@ -299,7 +321,7 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := generateRandomString(autologinLength)
+	token, err := generateRandomString(autologinLength)
 	if err != nil {
 		logger.Error(err)
 		response.MessageResponseJSON(w, false, http.StatusInternalServerError, response.Message{Message: err.Error()})
@@ -307,7 +329,7 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.CreateNewAutologinToken(r.Context(), dbUser.Username, id)
+	id, err := db.CreateNewAutologinToken(r.Context(), dbUser.Username, token)
 	if err != nil {
 		logger.Error(err)
 		// assuming error with db is missing value
@@ -317,8 +339,9 @@ func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auto := model.AutologinToken{
+		ID:             id,
 		Username:       dbUser.Username,
-		AutologinToken: id,
+		AutologinToken: token,
 		Site:           os.Getenv("AUTOLOGIN_URL"),
 	}
 

@@ -28,6 +28,7 @@ func CreateRouter() http.Handler {
 			r.Post("/", createLoginToken)
 			r.Post("/{token}", authoriseLoginToken)
 			r.Get("/", getAutologinTokens)
+			r.Get("/latest", getLatestAutologinTokens)
 			r.Get("/{token_id}", getAutologinToken)
 			r.Delete("/{token}", deleteAutologinToken)
 		})

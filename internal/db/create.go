@@ -28,17 +28,21 @@ func CreateNewUser(ctx context.Context, user *model.User) error {
 	return err
 }
 
-func CreateNewAutologinToken(ctx context.Context, username, uuid string) error {
+func CreateNewAutologinToken(ctx context.Context, username, uuid string) (int, error) {
 	logger.Info("Creating new autologin")
 
 	db := commonPostgres.GetDatabase()
 
-	_, err := db.Exec(
+	var id int
+
+	err := db.QueryRow(
 		ctx,
-		"INSERT INTO autologin_tokens(username,autologin_token) VALUES ($1,$2)",
+		"INSERT INTO autologin_tokens(username,autologin_token) VALUES ($1,$2) RETURNING id",
 		username,
 		uuid,
+	).Scan(
+		&id,
 	)
 
-	return err
+	return id, err
 }
