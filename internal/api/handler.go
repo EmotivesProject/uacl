@@ -223,6 +223,47 @@ func getAutologinTokens(w http.ResponseWriter, r *http.Request) {
 	response.ResultResponseJSON(w, false, http.StatusCreated, autologins)
 }
 
+func getAutologinToken(w http.ResponseWriter, r *http.Request) {
+	authUser, err := doAuthentication(r)
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	autologinID, err := extractID(r, "token_id")
+	if err != nil {
+		logger.Error(err)
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	autoLogin, err := db.FindAutologinByID(r.Context(), autologinID)
+	if err != nil {
+		logger.Error(err)
+		logger.Info("HERE3")
+		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
+
+		return
+	}
+
+	authorizedUsers := strings.Split(os.Getenv("AUTOLOGIN_CREATE_USERS"), ",")
+
+	inAuthorizedUsers := stringInSlice(authUser.Username, authorizedUsers)
+	isUsernameEqual := autoLogin.Username == authUser.Username
+	if !inAuthorizedUsers && !isUsernameEqual {
+		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
+
+		return
+	}
+
+	logger.Infof("Fetched autologin for %s", authUser.Username)
+
+	response.ResultResponseJSON(w, false, http.StatusCreated, autoLogin)
+}
+
 func createLoginToken(w http.ResponseWriter, r *http.Request) {
 	authUser, err := doAuthentication(r)
 	if err != nil {

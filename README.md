@@ -38,6 +38,7 @@ POST - /login - attempts to sign into an account. Only need to supply username a
 POST - /autologin - creates an autologin token for a user. Usage of the token is unlimited and has no expire date.
 POST - /autologin/{token} - attempts to find the {token} in the database and then creates a JWT for the user, signing them in
 GET - /autologin - Fetches all autologin tokens
+GET - /autologin/{token_id} - Fetches specific autologin token for the same user or AUTOLOGIN_CREATE_USERS users
 DELETE - /autologin/{token} - deletes the token if it can be found the database. Useful if any login tokens are compromised/lost/want to restrict the account.
 ```
 ## Database design
