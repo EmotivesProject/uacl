@@ -243,7 +243,6 @@ func getAutologinToken(w http.ResponseWriter, r *http.Request) {
 	autoLogin, err := db.FindAutologinByID(r.Context(), autologinID)
 	if err != nil {
 		logger.Error(err)
-		logger.Info("HERE3")
 		response.MessageResponseJSON(w, false, http.StatusBadRequest, response.Message{Message: err.Error()})
 
 		return
@@ -253,6 +252,7 @@ func getAutologinToken(w http.ResponseWriter, r *http.Request) {
 
 	inAuthorizedUsers := stringInSlice(authUser.Username, authorizedUsers)
 	isUsernameEqual := autoLogin.Username == authUser.Username
+
 	if !inAuthorizedUsers && !isUsernameEqual {
 		response.MessageResponseJSON(w, false, http.StatusUnauthorized, response.Message{Message: "no authorized"})
 
