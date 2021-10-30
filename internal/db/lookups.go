@@ -64,6 +64,22 @@ func FindAutologinForUser(ctx context.Context, autologinToken string) (model.Aut
 	return user, err
 }
 
+func FindAutologinByID(ctx context.Context, autologinID int) (model.AutologinToken, error) {
+	db := commonPostgres.GetDatabase()
+
+	var autologin model.AutologinToken
+
+	err := db.QueryRow(
+		ctx,
+		"SELECT username, autologin_token FROM autologin_tokens where id = $1",
+		autologinID,
+	).Scan(&autologin.Username, &autologin.AutologinToken)
+
+	autologin.Site = os.Getenv("AUTOLOGIN_URL")
+
+	return autologin, err
+}
+
 func FindAutologins(ctx context.Context) ([]model.AutologinToken, error) {
 	db := commonPostgres.GetDatabase()
 

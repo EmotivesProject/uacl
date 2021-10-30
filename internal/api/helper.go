@@ -3,6 +3,10 @@ package api
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"net/http"
+	"strconv"
+
+	"github.com/go-chi/chi"
 )
 
 func generateRandomBytes(n int) ([]byte, error) {
@@ -28,4 +32,10 @@ func stringInSlice(a string, list []string) bool {
 	}
 
 	return false
+}
+
+func extractID(r *http.Request, param string) (int, error) {
+	paramString := chi.URLParam(r, param)
+
+	return strconv.Atoi(paramString)
 }
